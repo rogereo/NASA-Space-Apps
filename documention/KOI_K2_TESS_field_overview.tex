@@ -1,0 +1,226 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\begin{document}
+
+\section*{Kepler (KOI), K2, and TESS --- Field Overviews for ML}
+
+This document gives concise, ML-oriented field summaries for three NASA Exoplanet Archive products: the Kepler Object of Interest (KOI) cumulative table, the K2 Planets \& Candidates catalog, and the TESS Objects of Interest (TOI) catalog.
+
+% ----------------------- KOI -----------------------
+\section*{KOI Cumulative Table Overview}
+
+The \textbf{Kepler Object of Interest (KOI) cumulative table} contains metadata about candidate exoplanets and their host stars, useful for training planet vs.\ false positive classifiers.
+
+\subsection*{Planet/KOI Identification Fields}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{kepid} & Unique ID of the star in the Kepler Input Catalog (``star's ID number''). \\
+\texttt{kepoi\_name} & KOI (Kepler Object of Interest) ID (e.g., \texttt{K00752.01}). \\
+\texttt{kepler\_name} & Official planet name if confirmed (e.g., Kepler-227 b). Empty if not yet confirmed. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Classification / Labels}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{koi\_disposition} & Status: \texttt{CONFIRMED}, \texttt{CANDIDATE}, or \texttt{FALSE POSITIVE}. Main target label. \\
+\texttt{koi\_pdisposition} & Pipeline's automatic classification (pre-vetting). \\
+\texttt{koi\_score} & Probability-like score (0--1) that the KOI is a true planet. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{False Positive Flags}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{koi\_fpflag\_nt} & Not transit-like (1 = suspicious, 0 = good). \\
+\texttt{koi\_fpflag\_ss} & Stellar variability issue. \\
+\texttt{koi\_fpflag\_co} & Contamination (e.g., background stars). \\
+\texttt{koi\_fpflag\_ec} & Evidence of eclipsing binary rather than a planet. \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\noindent\emph{These can be used as features to help the model filter out false positives.}
+
+\subsection*{Transit / Orbital Characteristics}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{koi\_period} & Orbital period (days). \\
+\texttt{koi\_time0bk} & Transit midpoint epoch (BJD). \\
+\texttt{koi\_duration} & Transit duration (hours). \\
+\texttt{koi\_depth} & Transit depth (ppm). Dimming amplitude (planet size clue). \\
+\texttt{koi\_prad} & Planet radius (Earth radii). \\
+\texttt{koi\_teq} & Equilibrium temperature (K). \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Host Star Properties}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{koi\_steff} & Stellar effective temperature (K). \\
+\texttt{koi\_slogg} & Surface gravity (log$_{10}$ cm s$^{-2}$). \\
+\texttt{koi\_srad} & Stellar radius (solar radii). \\
+\texttt{ra}, \texttt{dec} & Sky coordinates. \\
+\texttt{koi\_kepmag} & Kepler magnitude (brightness). \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Error Columns}
+Most fields have \texttt{\_err1} and \texttt{\_err2} (positive/negative errors). Use for uncertainty-aware models if needed.
+
+\subsection*{For ML Training (KOI)}
+\begin{itemize}
+  \item \textbf{Target:} \texttt{koi\_disposition} (planet vs.\ false positive).
+  \item \textbf{Useful features:} \texttt{koi\_period}, \texttt{koi\_duration}, \texttt{koi\_depth}, \texttt{koi\_prad}, \texttt{koi\_teq}, \texttt{koi\_fpflag\_*}, star: \texttt{koi\_steff}, \texttt{koi\_srad}.
+  \item \textbf{Drop initially:} IDs (\texttt{kepid}, \texttt{kepoi\_name}, \texttt{kepler\_name}), RA/Dec, extreme uncertainties.
+\end{itemize}
+
+% ----------------------- K2 -----------------------
+\section*{K2 Planets \& Candidates --- Field Overview}
+
+K2 extends Kepler with new fields along the ecliptic. The catalog lists candidates/confirmed planets plus host-star properties.
+
+\subsection*{Identification Fields}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{pl\_name} & Planet name (e.g., \emph{K2-18 b}) when confirmed. \\
+\texttt{hostname} & Host star/system (e.g., \emph{K2-18}). \\
+\texttt{default\_flag} & Preferred/``default'' solution row for that planet. \\
+\texttt{disposition} & \texttt{CANDIDATE}, \texttt{CONFIRMED}, or \texttt{FALSE POSITIVE}. \\
+\texttt{discoverymethod} & Usually \emph{Transit} for K2. \\
+\texttt{disc\_year}, \texttt{disc\_facility} & Discovery year and facility/mission. \\
+\texttt{sy\_snum}, \texttt{sy\_pnum} & \# stars in system; \# planets in system. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Transit / Orbital Characteristics}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{pl\_orbper} & Orbital period (days). \\
+\texttt{pl\_tranmid} & Transit epoch (BJD). \\
+\texttt{pl\_trandurh} & Transit duration (hours). \\
+\texttt{pl\_trandep} & Transit depth (fractional or ppm). \\
+\texttt{pl\_rade} & Planet radius (Earth radii). \\
+\texttt{pl\_insol} & Insolation (Earth units). \\
+\texttt{pl\_eqt} & Equilibrium temperature (K). \\
+\texttt{pl\_orbeccen} & Orbital eccentricity. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Host Star Properties}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{st\_teff} & Stellar effective temperature (K). \\
+\texttt{st\_logg} & Surface gravity (log$_{10}$ cm s$^{-2}$). \\
+\texttt{st\_rad} & Stellar radius (solar radii). \\
+\texttt{ra}, \texttt{dec} & Sky coordinates (ICRS). \\
+\texttt{sy\_dist} & Distance (pc). \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Classification \& References}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{disposition} & Final catalog disposition. \\
+\texttt{pl\_controv\_flag} & Indicates controversial solution exists. \\
+\texttt{pl\_refname}, \texttt{sy\_refname} & Parameter provenance / references. \\
+\texttt{rowupdate}, \texttt{releasedate} & Row last updated; public release date. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Error Columns}
+Uncertainties typically in \texttt{<field>err1} (positive) / \texttt{<field>err2} (negative); \texttt{<field>lim} for limit flags.
+
+\subsection*{For ML Training (K2)}
+\begin{itemize}
+\item \textbf{Target:} \texttt{disposition} (planet vs.\ false positive).
+\item \textbf{Useful features:} \texttt{pl\_orbper}, \texttt{pl\_trandurh}, \texttt{pl\_trandep}, \texttt{pl\_rade}, \texttt{pl\_insol}, \texttt{pl\_eqt}, \texttt{pl\_orbeccen}; star: \texttt{st\_teff}, \texttt{st\_logg}, \texttt{st\_rad}, \texttt{sy\_dist}.
+\item \textbf{Drop initially:} Names/IDs; RA/Dec unless needed; pure provenance fields.
+\end{itemize}
+
+% ----------------------- TESS -----------------------
+\section*{TESS Objects of Interest (TOI) --- Field Overview}
+
+The TOI catalog lists TESS candidates, TFOP Working Group dispositions, and derived planetary \& stellar parameters.
+
+\subsection*{Identification Fields}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{toi} & TESS Object of Interest ID (e.g., \texttt{TOI-700.01}). \\
+\texttt{tid} & TIC (TESS Input Catalog) identifier of the host star. \\
+\texttt{hostname} / \texttt{pl\_name} & Host star / planet name when confirmed. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Classification / Labels}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{tfopwg\_disp} & TFOPWG disposition: \texttt{CANDIDATE}, \texttt{CONFIRMED}, or \texttt{FALSE POSITIVE}. \\
+\texttt{disposition} & Catalog disposition (if present). \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Transit / Orbital Characteristics}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{pl\_orbper} & Orbital period (days). \\
+\texttt{pl\_tranmid} & Transit epoch (BJD). \\
+\texttt{pl\_trandurh} & Transit duration (hours). \\
+\texttt{pl\_trandep} & Transit depth (fractional or ppm). \\
+\texttt{pl\_rade} & Planet radius (Earth radii). \\
+\texttt{pl\_insol} & Insolation (Earth units). \\
+\texttt{pl\_eqt} & Equilibrium temperature (K). \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Host Star Properties}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{st\_teff} & Stellar effective temperature (K). \\
+\texttt{st\_logg} & Surface gravity (log$_{10}$ cm s$^{-2}$). \\
+\texttt{st\_rad} & Stellar radius (solar radii). \\
+\texttt{ra}, \texttt{dec} & Sky coordinates (ICRS). \\
+\texttt{st\_tmag} & TESS-band magnitude. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Administrative / Provenance}
+\begin{tabular}{@{}p{0.28\linewidth} p{0.68\linewidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Meaning} \\ \midrule
+\texttt{disc\_year}, \texttt{disc\_facility} & Discovery year and facility/mission (if present). \\
+\texttt{rowupdate} & Archive row last updated. \\
+\texttt{toi\_created} & Date the TOI record was created. \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Error Columns}
+Numeric fields often have \texttt{err1}/\texttt{err2} and sometimes \texttt{lim} flags indicating limits.
+
+\subsection*{For ML Training (TESS)}
+\begin{itemize}
+\item \textbf{Target:} \texttt{tfopwg\_disp} or \texttt{disposition} (planet vs.\ false positive).
+\item \textbf{Useful features:} \texttt{pl\_orbper}, \texttt{pl\_trandurh}, \texttt{pl\_trandep}, \texttt{pl\_rade}, \texttt{pl\_insol}, \texttt{pl\_eqt}; star: \texttt{st\_teff}, \texttt{st\_logg}, \texttt{st\_rad}, \texttt{st\_tmag}.
+\item \textbf{Drop initially:} \texttt{toi}, \texttt{tid}, names/IDs, RA/Dec unless required, provenance-only fields.
+\end{itemize}
+
+\end{document}
