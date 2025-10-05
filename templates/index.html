@@ -5,34 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanet Explorer - Discover Worlds Beyond</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #05071E;
+            --bg-secondary: #10122B;
+            --accent-primary: #7A67FF;
+            --accent-secondary: #A855F7;
+            --text-primary: #E0E0FF;
+            --text-secondary: #A8B2D1;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0c0e2a 0%, #1a1d4e 100%);
-            color: #e0e0ff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(122, 103, 255, 0.15) 0%, transparent 60%);
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
         header {
             padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(10, 12, 35, 0.8);
+            background: rgba(5, 7, 30, 0.6);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -47,104 +83,111 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-decoration: none;
         }
 
         .logo i {
             font-size: 28px;
-            color: #6c63ff;
+            color: var(--accent-primary);
         }
 
         .logo h1 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         nav ul {
             display: flex;
             list-style: none;
-            gap: 30px;
+            gap: 35px;
         }
 
         nav a {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            font-size: 15px;
+            transition: color 0.3s ease;
             position: relative;
         }
 
         nav a:hover {
-            color: #6c63ff;
+            color: var(--text-primary);
         }
 
         nav a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
-            left: 0;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            transition: width 0.3s;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
         }
 
         nav a:hover::after {
             width: 100%;
         }
 
+        main {
+            flex-grow: 1;
+        }
+
         .hero {
-            padding: 100px 0;
+            padding: 120px 0;
             text-align: center;
-            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
         }
 
         .hero h2 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #e0e0ff, #a5b4fc);
+            font-size: 3.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(90deg, #FFFFFF, #A5B4FC);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
         }
 
         .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            color: #b0b0ff;
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto 40px;
+            color: var(--text-secondary);
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 30px;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            padding: 14px 32px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
             color: white;
-            border-radius: 30px;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            font-size: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(122, 103, 255, 0.2), 0 2px 5px rgba(122, 103, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(122, 103, 255, 0.3), 0 4px 10px rgba(122, 103, 255, 0.2);
         }
 
         .onboarding-guide {
             max-width: 350px;
             margin: 40px auto 0;
-            background: rgba(108, 99, 255, 0.2);
-            border: 1px solid #6c63ff;
-            border-radius: 10px;
+            background: rgba(122, 103, 255, 0.1);
+            border: 1px solid rgba(122, 103, 255, 0.3);
+            border-radius: 12px;
             padding: 15px 20px;
             position: relative;
             text-align: left;
-            box-shadow: 0 5px 20px rgba(108, 99, 255, 0.15);
         }
 
         .onboarding-guide-pointer {
@@ -156,16 +199,17 @@
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-bottom: 10px solid #6c63ff;
+            border-bottom: 10px solid rgba(122, 103, 255, 0.3);
         }
 
         .onboarding-guide-content strong {
-            color: #e0e0ff;
-            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .onboarding-guide-content p {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             margin: 5px 0 0;
         }
@@ -176,26 +220,28 @@
             right: 10px;
             background: none;
             border: none;
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 24px;
             cursor: pointer;
             line-height: 1;
-            transition: color 0.3s;
+            transition: color 0.3s ease;
         }
 
         .onboarding-guide-close:hover {
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .features {
-            padding: 80px 0;
+            padding: 100px 0;
         }
 
         .section-title {
             text-align: center;
-            margin-bottom: 50px;
-            font-size: 2.2rem;
-            color: #e0e0ff;
+            margin-bottom: 60px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
         }
 
         .features-grid {
@@ -205,91 +251,82 @@
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            transition: transform 0.3s, background 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 35px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            border: 1px solid var(--border-color);
         }
 
         .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-8px);
+            background: linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0.03)), var(--bg-secondary);
         }
 
         .feature-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-            color: #6c63ff;
+            font-size: 32px;
+            margin-bottom: 24px;
+            color: var(--accent-primary);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .feature-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 600;
             margin-bottom: 15px;
-            color: #e0e0ff;
+            color: var(--text-primary);
         }
 
         .feature-card p {
-            color: #b0b0ff;
+            color: var(--text-secondary);
         }
 
         footer {
             margin-top: auto;
-            background: rgba(5, 7, 25, 0.9);
-            padding: 60px 0 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
+            padding: 80px 0 30px;
+            border-top: 1px solid var(--border-color);
         }
 
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
         }
 
         .footer-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .footer-logo i {
-            font-size: 24px;
-            color: #6c63ff;
+            font-size: 28px;
+            color: var(--accent-primary);
         }
 
         .footer-logo h3 {
             font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .footer-about p {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 0.95rem;
             line-height: 1.7;
+            max-width: 350px;
         }
 
         .footer-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #e0e0ff;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-section h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
         }
 
         .footer-links {
@@ -297,19 +334,17 @@
         }
 
         .footer-links li {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .footer-links a {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: color 0.3s, transform 0.3s;
-            display: inline-block;
+            transition: color 0.3s ease;
         }
 
         .footer-links a:hover {
-            color: #6c63ff;
-            transform: translateX(5px);
+            color: var(--accent-primary);
         }
 
         .social-links {
@@ -324,23 +359,23 @@
             width: 40px;
             height: 40px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            color: #b0b0ff;
+            border-radius: 8px;
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .social-links a:hover {
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            background: var(--accent-primary);
             color: white;
             transform: translateY(-3px);
         }
 
         .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
             text-align: center;
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
@@ -351,16 +386,20 @@
             }
             
             nav ul {
-                gap: 15px;
+                gap: 20px;
             }
             
             .hero h2 {
-                font-size: 2.5rem;
+                font-size: 2.8rem;
+            }
+
+            .hero {
+                padding: 80px 0;
             }
             
             .footer-content {
                 grid-template-columns: 1fr;
-                gap: 30px;
+                gap: 40px;
             }
         }
     </style>
@@ -386,51 +425,53 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <h2>Discover Worlds Beyond Our Solar System</h2>
-            <p>Your gateway to exploring exoplanets with the latest research, data, and stunning visualizations of distant worlds.</p>
-            <a href="/dashboard" class="btn">Start Exploring</a>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h2>Discover Worlds Beyond Our Solar System</h2>
+                <p>Your gateway to exploring exoplanets with the latest research, data, and stunning visualizations of distant worlds.</p>
+                <a href="/dashboard" class="btn">Start Exploring</a>
 
-            <div class="onboarding-guide" id="onboardingGuide">
-                <div class="onboarding-guide-pointer"></div>
-                <div class="onboarding-guide-content">
-                    <strong>Ready to Explore?</strong>
-                    <p>Click "Start Exploring" to dive into the interactive data dashboard.</p>
-                </div>
-                <button class="onboarding-guide-close" id="closeOnboardingGuide" aria-label="Close Guide">&times;</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Explore the Universe</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-star"></i>
+                <div class="onboarding-guide" id="onboardingGuide">
+                    <div class="onboarding-guide-pointer"></div>
+                    <div class="onboarding-guide-content">
+                        <strong>Ready to Explore?</strong>
+                        <p>Click "Start Exploring" to dive into the interactive data dashboard.</p>
                     </div>
-                    <h3>Latest Discoveries</h3>
-                    <p>Stay updated with the most recent exoplanet discoveries from telescopes around the world and in space.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3>Research Papers</h3>
-                    <p>Access a curated collection of scientific papers and studies on exoplanet research and astronomy.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3>Educational Resources</h3>
-                    <p>Learn about exoplanets with our comprehensive guides, interactive tools, and educational materials.</p>
+                    <button class="onboarding-guide-close" id="closeOnboardingGuide" aria-label="Close Guide">&times;</button>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Explore the Universe</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Latest Discoveries</h3>
+                        <p>Stay updated with the most recent exoplanet discoveries from telescopes around the world and in space.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3>Research Papers</h3>
+                        <p>Access a curated collection of scientific papers and studies on exoplanet research and astronomy.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Educational Resources</h3>
+                        <p>Learn about exoplanets with our comprehensive guides, interactive tools, and educational materials.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <div class="container">
