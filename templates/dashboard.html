@@ -5,19 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanet Explorer - Data Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #05071E;
+            --bg-secondary: #10122B;
+            --accent-primary: #7A67FF;
+            --accent-secondary: #A855F7;
+            --text-primary: #E0E0FF;
+            --text-secondary: #A8B2D1;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0c0e2a 0%, #1a1d4e 100%);
-            color: #e0e0ff;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(122, 103, 255, 0.15) 0%, transparent 60%);
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+            z-index: -1;
         }
 
         .container {
@@ -28,9 +65,9 @@
 
         header {
             padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(10, 12, 35, 0.8);
+            background: rgba(5, 7, 30, 0.6);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -45,53 +82,54 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-decoration: none;
         }
 
         .logo i {
             font-size: 28px;
-            color: #6c63ff;
+            color: var(--accent-primary);
         }
 
         .logo h1 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         nav ul {
             display: flex;
             list-style: none;
-            gap: 30px;
+            gap: 35px;
         }
 
         nav a {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            font-size: 15px;
+            transition: color 0.3s ease;
             position: relative;
         }
 
         nav a:hover {
-            color: #6c63ff;
+            color: var(--text-primary);
         }
-
+        
         nav a.active {
-            color: #6c63ff;
+            color: var(--text-primary);
         }
 
         nav a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
-            left: 0;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            transition: width 0.3s;
+            background: var(--accent-primary);
+            transition: width 0.3s ease;
         }
 
         nav a:hover::after, nav a.active::after {
@@ -99,76 +137,87 @@
         }
 
         .dashboard-hero {
-            padding: 60px 0 30px;
+            padding: 80px 0 40px;
             text-align: center;
-            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
         }
 
         .dashboard-hero h2 {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            font-weight: 700;
             margin-bottom: 15px;
-            background: linear-gradient(90deg, #e0e0ff, #a5b4fc);
+            background: linear-gradient(90deg, #FFFFFF, #A5B4FC);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        
+        .dashboard-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
         .search-container {
             max-width: 600px;
-            margin: 30px auto;
+            margin: 40px auto;
             position: relative;
         }
 
         .search-box {
             width: 100%;
-            padding: 15px 50px 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 50px 15px 25px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 30px;
-            color: #e0e0ff;
+            color: var(--text-primary);
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .search-box:focus {
             outline: none;
-            border-color: #6c63ff;
-            box-shadow: 0 0 20px rgba(108, 99, 255, 0.3);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(122, 103, 255, 0.2);
         }
 
         .search-icon {
             position: absolute;
-            right: 20px;
+            right: 25px;
             top: 50%;
             transform: translateY(-50%);
-            color: #b0b0ff;
-            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin: 30px 0;
+            margin-bottom: 40px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0.03)), var(--bg-secondary);
         }
 
         .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #6c63ff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
             margin-bottom: 5px;
         }
 
         .stat-label {
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
@@ -177,11 +226,11 @@
         }
 
         .table-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
             padding: 20px;
             overflow-x: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             margin-bottom: 30px;
         }
 
@@ -192,87 +241,206 @@
         }
 
         .data-table th {
-            background: rgba(108, 99, 255, 0.2);
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
-            color: #e0e0ff;
-            border-bottom: 2px solid rgba(108, 99, 255, 0.5);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
             font-size: 0.9rem;
             cursor: pointer;
             transition: background 0.3s;
         }
 
         .data-table th:hover {
-            background: rgba(108, 99, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .data-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: #b0b0ff;
-            font-size: 0.85rem;
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
         }
 
         .data-table tr:hover td {
             background: rgba(255, 255, 255, 0.05);
-        }
-
-        .data-table tr.selected {
-            background: white !important;
+            color: var(--text-primary);
         }
 
         .data-table tr.selected td {
-            color: #1a1d4e !important;
+            background: var(--accent-primary) !important;
+            color: white !important;
             font-weight: 600;
         }
 
         .status-match {
-            background: rgba(16, 185, 129, 0.3) !important;
-            color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: var(--success-color) !important;
             font-weight: 600;
         }
 
         .actual-em-cell {
-            background: rgba(16, 185, 129, 0.4) !important;
-            color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: var(--success-color) !important;
             font-weight: 700;
-            border: 2px solid #10b981 !important;
+            border: 1px solid var(--success-color) !important;
         }
 
-        .nasa-section {
-            margin: 40px 0;
-        }
-
-        .nasa-header {
+        .pagination-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-top: 20px;
+            padding: 15px 0;
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--accent-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-number {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .page-number:hover {
+            background: rgba(122, 103, 255, 0.2);
+            border-color: var(--accent-primary);
+        }
+
+        .page-number.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .nasa-section, .github-section {
+            margin: 60px 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             padding: 0 10px;
         }
 
-        .nasa-title {
-            font-size: 1.5rem;
-            color: #e0e0ff;
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
             font-weight: 600;
         }
 
         .selected-planet {
-            color: #6c63ff;
+            color: var(--accent-primary);
             font-weight: 600;
             font-size: 1.1rem;
         }
 
-        .iframe-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+        .card-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             height: 600px;
             position: relative;
+        }
+
+        .visualization-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gif-content {
+            position: relative;
+        }
+
+        #gifImg {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .gif-controls {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .control-btn {
+            background: rgba(5, 7, 30, 0.7);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-btn:hover {
+            background: var(--accent-primary);
+            color: white;
         }
 
         .nasa-iframe {
@@ -289,38 +457,20 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: #b0b0ff;
+            color: var(--text-secondary);
             text-align: center;
         }
 
         .iframe-placeholder i {
             font-size: 4rem;
-            color: #6c63ff;
+            color: var(--accent-primary);
             margin-bottom: 20px;
         }
 
         .iframe-placeholder h3 {
             font-size: 1.5rem;
             margin-bottom: 10px;
-            color: #e0e0ff;
-        }
-
-        .github-section {
-            margin: 40px 0;
-        }
-
-        .github-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 10px;
-        }
-
-        .github-title {
-            font-size: 1.5rem;
-            color: #e0e0ff;
-            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .github-stats {
@@ -329,18 +479,19 @@
         }
 
         .github-stat {
-            background: rgba(108, 99, 255, 0.2);
+            background: rgba(122, 103, 255, 0.15);
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.9rem;
-            color: #b0b0ff;
+            color: var(--text-secondary);
+            border: 1px solid rgba(122, 103, 255, 0.3);
         }
 
         .github-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
         }
 
         .github-content {
@@ -350,31 +501,26 @@
             align-items: start;
         }
 
-        .github-info {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         .github-description {
-            color: #b0b0ff;
-            line-height: 1.6;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
 
         .github-features {
             list-style: none;
+            margin-top: 20px;
         }
 
         .github-features li {
-            margin-bottom: 10px;
-            color: #b0b0ff;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .github-features li i {
-            color: #10b981;
+            color: var(--success-color);
         }
 
         .github-links {
@@ -386,258 +532,162 @@
         .github-link {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
             text-decoration: none;
-            color: #e0e0ff;
-            transition: all 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
         }
 
         .github-link:hover {
-            background: rgba(108, 99, 255, 0.2);
-            transform: translateY(-2px);
-            border-color: #6c63ff;
+            background: rgba(122, 103, 255, 0.15);
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
         }
 
         .github-link i {
             font-size: 1.5rem;
-            color: #6c63ff;
+            color: var(--accent-primary);
         }
 
         .github-link-content h4 {
             font-size: 1.1rem;
             margin-bottom: 5px;
-            color: #e0e0ff;
+            color: var(--text-primary);
         }
 
         .github-link-content p {
             font-size: 0.9rem;
-            color: #b0b0ff;
+            color: var(--text-secondary);
             margin: 0;
         }
 
-        .search-results-info {
+        .search-results-info, .error-message, .no-data, .loading {
             text-align: center;
             margin: 20px 0;
-            color: #b0b0ff;
-            font-style: italic;
-        }
-
-        .error-message {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            border-radius: 10px;
             padding: 20px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .error-message i {
-            font-size: 2rem;
-            color: #ff6b6b;
-            margin-bottom: 10px;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #b0b0ff;
-        }
-
-        .no-data i {
-            font-size: 3rem;
-            color: #6c63ff;
-            margin-bottom: 15px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #b0b0ff;
-        }
-
-        .loading i {
-            font-size: 2rem;
-            color: #6c63ff;
-            margin-bottom: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-secondary);
         }
 
         footer {
-            margin-top: 60px;
-            background: rgba(5, 7, 25, 0.9);
-            padding: 60px 0 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+            background: var(--bg-secondary);
+            padding: 80px 0 30px;
+            border-top: 1px solid var(--border-color);
         }
 
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
         }
 
         .footer-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .footer-logo i {
-            font-size: 24px;
-            color: #6c63ff;
+            font-size: 28px;
+            color: var(--accent-primary);
         }
 
         .footer-logo h3 {
             font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #6c63ff, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .footer-about p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 350px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: translateY(-3px);
         }
 
         .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
             text-align: center;
-            color: #b0b0ff;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
-            .header-content {
+            .header-content, .pagination-container, .section-header {
                 flex-direction: column;
                 gap: 20px;
-            }
-            
-            nav ul {
-                gap: 15px;
             }
             
             .dashboard-hero h2 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
-            .stats-container {
+            .stats-container, .github-content, .footer-content {
                 grid-template-columns: 1fr;
             }
             
-            .data-table {
-                min-width: 1000px;
-            }
-            
-            .nasa-header,
-            .github-header {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-            
-            .iframe-container {
+            .card-container {
                 height: 400px;
             }
-            
-            .github-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .github-stats {
-                justify-content: center;
-            }
-        }
-
-        .visualization-container {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            width: 100%;
-            height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        .visualization {
-            flex: 1;
-            margin-right: 20px;
-            position: relative;
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .visualization-iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            border-radius: 5px;
-        }
-
-        .dimension-indicator {
-            position: absolute;
-            background: rgba(108, 99, 255, 0.8);
-            color: white;
-            font-size: 12px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            z-index: 10;
-            font-weight: 500;
-        }
-
-        .width-indicator {
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .height-indicator {
-            right: -40px;
-            top: 50%;
-            transform: translateY(-50%);
-            writing-mode: vertical-rl;
-        }
-
-        .dimension-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #6c63ff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .match-cell {
-            background: rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        .mismatch-cell {
-            background: rgba(220, 38, 38, 0.3);
-            color: #dc2626;
-            font-weight: bold;
-        }
-
-        .actual-cell {
-            background: rgba(59, 130, 246, 0.3);
-            color: #3b82f6;
-            font-weight: bold;
-            border: 1px solid #3b82f6;
         }
     </style>
 </head>
@@ -645,16 +695,14 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <div class="logo">
+                <a href="/" class="logo">
                     <i class="fas fa-globe-americas"></i>
                     <h1>Exoplanet Explorer</h1>
-                </div>
+                </a>
                 <nav>
                     <ul>
                         <li><a href="/">Home</a></li>
                         <li><a href="/dashboard" class="active">Dashboard</a></li>
-                        <li><a href="#">Research</a></li>
-                        <li><a href="#">Resources</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
                 </nav>
@@ -662,230 +710,207 @@
         </div>
     </header>
 
-    <section class="dashboard-hero">
+    <main>
+        <section class="dashboard-hero">
+            <div class="container">
+                <h2>Exoplanet Data Dashboard</h2>
+                <p>Explore and analyze exoplanet data from our comprehensive database</p>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-box" placeholder="Search for planets, stars, discovery methods...">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <div class="container">
-            <h2>Exoplanet Data Dashboard</h2>
-            <p>Explore and analyze exoplanet data from our comprehensive database</p>
-            
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-box" placeholder="Search across all columns...">
-                <div class="search-icon">
-                    <i class="fas fa-search"></i>
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Data</h3>
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
+
+            <div id="searchResultsInfo" class="search-results-info" style="display: none;"></div>
+
+            {% if stats %}
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecords">{{ stats.total_rows }}</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_columns }}</div>
+                    <div class="stat-label">Data Columns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.column_names|length }}</div>
+                    <div class="stat-label">Features Tracked</div>
                 </div>
             </div>
-        </div>
-    </section>
+            {% endif %}
 
-    <div class="container">
-        {% if error %}
-        <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Data</h3>
-            <p>{{ error }}</p>
-        </div>
-        {% endif %}
-
-        <div id="searchResultsInfo" class="search-results-info" style="display: none;"></div>
-
-        {% if stats %}
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-number" id="totalRecords">{{ stats.total_rows }}</div>
-                <div class="stat-label">Total Records</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ stats.total_columns }}</div>
-                <div class="stat-label">Data Columns</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ stats.column_names|length }}</div>
-                <div class="stat-label">Features Tracked</div>
-            </div>
-        </div>
-        {% endif %}
-
-        <section class="data-section">
-            <div class="table-container">
-                <div id="loadingIndicator" class="loading" style="display: none;">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Searching data...</p>
-                </div>
-
-                <div id="tableContent">
-                    {% if data %}
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                {% for column in columns %}
-                                <th>{{ column }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            {% for row in data %}
-                            <tr
-                                data-gif="{{ row['gif'] if row.get('gif') else '' }}"
-                                data-nasa="{{ row['nasa_url'] if row.get('nasa_url') else '' }}">
-                                {% for column in columns %}
-                                <td data-column="{{ column }}">{{ row[column] }}</td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    {% else %}
-                    <div class="no-data">
-                        <i class="fas fa-database"></i>
-                        <h3>No Data Available</h3>
-                        <p>Please ensure your data.csv file is in the correct location and format.</p>
+            <section class="data-section">
+                <div class="table-container">
+                    <div id="loadingIndicator" class="loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Searching data...</p>
                     </div>
-                    {% endif %}
-                </div>
 
-                <div class="pagination" style="text-align: right; margin-top: 20px;">
-                    {% if stats.total_pages > 1 %}
-                    <nav>
-                        <ul style="list-style: none; display: inline-flex; gap: 10px; padding: 0;">
-                            {% for page_num in range(1, stats.total_pages + 1) %}
-                            <li>
-                                <a href="/dashboard?page={{ page_num }}"
-                                   style="padding: 5px 10px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; text-decoration: none; color: {% if page_num == stats.current_page %}#6c63ff{% else %}#b0b0ff{% endif %}; background: {% if page_num == stats.current_page %}rgba(108, 99, 255, 0.2){% endif %};">
-                                   {{ page_num }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </nav>
-                    {% endif %}
+                    <div id="tableContent">
+                        {% if data %}
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    {% for column in columns %}
+                                    <th>{{ column }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                {% for row in data %}
+                                <tr
+                                    data-gif="{{ row['gif'] if row.get('gif') else '' }}"
+                                    data-nasa="{{ row['nasa_url'] if row.get('nasa_url') else '' }}">
+                                    {% for column in columns %}
+                                    <td data-column="{{ column }}">{{ row[column] }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="pagination-container">
+                            <div class="pagination-info" id="paginationInfo">
+                                Showing 1 to 10 of {{ stats.total_rows }} records
+                            </div>
+                            <div class="pagination-controls">
+                                <button class="pagination-btn" id="prevPage" disabled>
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                <div class="page-numbers" id="pageNumbers"></div>
+                                <button class="pagination-btn" id="nextPage">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="no-data">
+                            <i class="fas fa-database"></i>
+                            <h3>No Data Available</h3>
+                            <p>Please ensure your data.csv file is in the correct location and format.</p>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="nasa-section">
-            <div class="nasa-header">
-                <div class="nasa-title">
-                    <i class="fas fa-satellite"></i>
-                    NASA Exoplanet Exploration
+            <section class="nasa-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-satellite"></i>
+                        NASA Exoplanet Exploration
+                    </div>
+                    <div class="selected-planet" id="selectedPlanet">
+                        Select a planet to view details
+                    </div>
                 </div>
-                <div class="selected-planet" id="selectedPlanet">
-                    Select a planet to view details
-                </div>
-            </div>
-            <div class="iframe-container">
-                <div id="iframePlaceholder" class="iframe-placeholder">
-                    <i class="fas fa-globe-americas"></i>
-                    <h3>No Planet Selected</h3>
-                    <p>Click on a row in the table above to view NASA exoplanet data</p>
-                </div>
-                <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" 
-                        src=""
-                        allowfullscreen>
-                </iframe>
-            </div>
-        </section>
-
-        <div class="visualization-container">
-            <div class="visualization" id="gifContainer" style="position: relative;">
-                <div class="dimension-indicator width-indicator" id="gifWidthIndicator">800px</div>
-                <div class="dimension-indicator height-indicator" id="gifHeightIndicator">600px</div>
-                <div class="w-full h-screen" style="height: 861px; width: 738px; margin: 0 auto; position: relative;">
-                    <div style="width: 738px; height: 861px; margin: 0 auto; position: relative;">
-                        <iframe
-                            id="gifIframe"
+                <div class="card-container">
+                    <div id="iframePlaceholder" class="iframe-placeholder">
+                        <i class="fas fa-globe-americas"></i>
+                        <h3>No Planet Selected</h3>
+                        <p>Click on a row in the table above to view NASA exoplanet data</p>
+                    </div>
+                    <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" 
                             src=""
-                            width="738"
-                            height="861"
-                            style="border: none; width: 738px; height: 861px; display: none; border-radius: 6px; background: #000;"
-                            title="GIF Visualization"
-                            aria-hidden="true">
-                        </iframe>
-                        <img id="gifImg" src="" alt="GIF Visualization"
-                            width="738" height="861"
-                            style="display: none; width: 738px; height: 861px; border-radius: 6px; object-fit: contain;">
-                        <div id="gifPlaceholder"
-                            class="iframe-placeholder"
-                            style="position: absolute; left: 0; top: 0; width: 738px; height: 861px; display:flex; align-items:center; justify-content:center; border-radius:6px;">
-                            <div style="text-align:center; color:#b0b0ff; width:100%;">
-                                <i class="fas fa-image" style="font-size:2.5rem; color:#6c63ff; display:block; margin-bottom:10px;"></i>
-                                <div>No GIF selected</div>
-                            </div>
-                        </div>
-                        <div class="gif-controls" style="position: absolute; bottom: 12px; left: 12px; display: flex; gap: 10px; z-index: 10;">
-                            <button id="playButton" class="control-btn">Play</button>
-                            <button id="pauseButton" class="control-btn">Pause</button>
-                            <button id="dragButton" class="control-btn">Drag</button>
-                        </div>
-                    </div>
+                            allowfullscreen>
+                    </iframe>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <section class="github-section">
-            <div class="github-header">
-                <div class="github-title">
-                    <i class="fab fa-github"></i>
-                    Project Repository
-                </div>
-                <div class="github-stats">
-                    <div class="github-stat">
-                        <i class="fas fa-code-branch"></i>
-                        Open Source
-                    </div>
-                    <div class="github-stat">
-                        <i class="fas fa-star"></i>
-                        MIT License
+            <section class="nasa-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-film"></i>
+                        Light Curve GIF Visualization
                     </div>
                 </div>
-            </div>
-            <div class="github-container">
-                <div class="github-content">
-                    <div class="github-info">
-                        <div class="github-description">
-                            <p>This exoplanet exploration dashboard is an open-source project dedicated to making exoplanet data accessible and interactive for researchers, students, and astronomy enthusiasts.</p>
-                            <p>Explore the code, contribute to the project, or use the data for your own research.</p>
+                <div class="visualization-container">
+                    <div id="gifContent" class="gif-content">
+                        <div id="gifPlaceholder" class="iframe-placeholder">
+                            <i class="fas fa-image"></i>
+                            <h3>No GIF Selected</h3>
+                            <p>Click on a row in the table to see its light curve visualization.</p>
                         </div>
-                        <ul class="github-features">
-                            <li><i class="fas fa-check"></i> Real-time exoplanet data analysis</li>
-                            <li><i class="fas fa-check"></i> Interactive NASA visualizations</li>
-                            <li><i class="fas fa-check"></i> Machine learning predictions</li>
-                            <li><i class="fas fa-check"></i> Open data and open source</li>
-                            <li><i class="fas fa-check"></i> Community-driven development</li>
-                        </ul>
-                    </div>
-                    <div class="github-links">
-                        <a href="https://github.com/your-username/exoplanet-explorer" class="github-link" target="_blank">
-                            <i class="fab fa-github"></i>
-                            <div class="github-link-content">
-                                <h4>Main Repository</h4>
-                                <p>View source code and documentation</p>
-                            </div>
-                        </a>
-                        <a href="https://github.com/your-username/exoplanet-explorer/issues" class="github-link" target="_blank">
-                            <i class="fas fa-bug"></i>
-                            <div class="github-link-content">
-                                <h4>Report Issues</h4>
-                                <p>Found a bug? Let us know</p>
-                            </div>
-                        </a>
-                        <a href="https://github.com/your-username/exoplanet-explorer/pulls" class="github-link" target="_blank">
-                            <i class="fas fa-code-pull-request"></i>
-                            <div class="github-link-content">
-                                <h4>Contribute</h4>
-                                <p>Submit pull requests and improvements</p>
-                            </div>
-                        </a>
-                        <a href="https://github.com/your-username/exoplanet-explorer/wiki" class="github-link" target="_blank">
-                            <i class="fas fa-book"></i>
-                            <div class="github-link-content">
-                                <h4>Documentation</h4>
-                                <p>Read the project wiki and guides</p>
-                            </div>
-                        </a>
+                        <img id="gifImg" src="" alt="GIF Visualization" style="display: none;">
+                        <div class="gif-controls" style="display: none;">
+                            <button id="playButton" class="control-btn"><i class="fas fa-play"></i> Play</button>
+                            <button id="pauseButton" class="control-btn"><i class="fas fa-pause"></i> Pause</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </div>
+            </section>
+
+            <section class="github-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fab fa-github"></i>
+                        Project Repository
+                    </div>
+                    <div class="github-stats">
+                        <div class="github-stat">
+                            <i class="fas fa-code-branch"></i>
+                            Open Source
+                        </div>
+                        <div class="github-stat">
+                            <i class="fas fa-star"></i>
+                            MIT License
+                        </div>
+                    </div>
+                </div>
+                <div class="github-container">
+                    <div class="github-content">
+                        <div class="github-info">
+                            <div class="github-description">
+                                <p>This exoplanet exploration dashboard is an open-source project dedicated to making exoplanet data accessible and interactive for researchers, students, and astronomy enthusiasts.</p>
+                            </div>
+                            <ul class="github-features">
+                                <li><i class="fas fa-check"></i> Real-time exoplanet data analysis</li>
+                                <li><i class="fas fa-check"></i> Interactive NASA visualizations</li>
+                                <li><i class="fas fa-check"></i> Community-driven development</li>
+                            </ul>
+                        </div>
+                        <div class="github-links">
+                            <a href="https://github.com/your-username/exoplanet-explorer" class="github-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <div class="github-link-content">
+                                    <h4>Main Repository</h4>
+                                    <p>View source code and documentation</p>
+                                </div>
+                            </a>
+                            <a href="https://github.com/your-username/exoplanet-explorer/issues" class="github-link" target="_blank">
+                                <i class="fas fa-bug"></i>
+                                <div class="github-link-content">
+                                    <h4>Report Issues</h4>
+                                    <p>Found a bug? Let us know</p>
+                                </div>
+                            </a>
+                            <a href="https://github.com/your-username/exoplanet-explorer/pulls" class="github-link" target="_blank">
+                                <i class="fas fa-code-pull-request"></i>
+                                <div class="github-link-content">
+                                    <h4>Contribute</h4>
+                                    <p>Submit pull requests and improvements</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 
     <footer>
         <div class="container">
@@ -903,18 +928,14 @@
                         <li><a href="/">Home</a></li>
                         <li><a href="/dashboard">Data Dashboard</a></li>
                         <li><a href="/about">About</a></li>
-                        <li><a href="#">Research Papers</a></li>
-                        <li><a href="#">Mission Updates</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h3>Connect</h3>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
                         <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
             </div>
@@ -924,10 +945,6 @@
         </div>
     </footer>
 
-    <button class="dimension-toggle" id="dimensionToggle">
-        <i class="fas fa-ruler"></i>
-    </button>
-
     <script>
         // Make visible columns available to client JS (used by updateTable)
         const VISIBLE_COLUMNS = {{ columns|tojson }};
@@ -935,151 +952,171 @@
         // Update copyright year automatically
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
+        // Pagination variables
+        const recordsPerPage = 10;
+        let currentPage = 1;
+        let totalPages = Math.ceil({{ stats.total_rows }} / recordsPerPage);
+        let allData = {{ data|tojson }};
+        let filteredData = allData;
+
+        // Initialize pagination
+        function initializePagination() {
+            updatePaginationControls();
+            renderPageNumbers();
+        }
+
+        // Update pagination controls
+        function updatePaginationControls() {
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = Math.min(startIndex + recordsPerPage, filteredData.length);
+            const totalRecords = filteredData.length;
+            
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${startIndex + 1} to ${endIndex} of ${totalRecords} records`;
+            
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        // Render page numbers
+        function renderPageNumbers() {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+
+            addPageNumber(1);
+            
+            if (currentPage > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'page-number';
+                ellipsis.textContent = '...';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+            
+            const startPage = Math.max(2, currentPage - 1);
+            const endPage = Math.min(totalPages - 1, currentPage + 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                addPageNumber(i);
+            }
+            
+            if (currentPage < totalPages - 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'page-number';
+                ellipsis.textContent = '...';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+            
+            addPageNumber(totalPages);
+        }
+
+        function addPageNumber(pageNumber) {
+            const pageElement = document.createElement('div');
+            pageElement.className = 'page-number';
+            if (pageNumber === currentPage) {
+                pageElement.classList.add('active');
+            }
+            pageElement.textContent = pageNumber;
+            pageElement.addEventListener('click', () => {
+                if (pageNumber !== currentPage) {
+                    currentPage = pageNumber;
+                    renderTable();
+                    updatePaginationControls();
+                    renderPageNumbers();
+                }
+            });
+            document.getElementById('pageNumbers').appendChild(pageElement);
+        }
+
+        // Render table for current page
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            if (!tableBody) return;
+            
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = Math.min(startIndex + recordsPerPage, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            if (pageData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="${VISIBLE_COLUMNS.length}" style="text-align: center; padding: 40px;">
+                            No results found for your search.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            pageData.forEach((row) => {
+                const rowGif = row['gif'] || row['gif_url'] || '';
+                const rowNasa = row['nasa_url'] || row['nasa'] || '';
+                html += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}">`;
+                VISIBLE_COLUMNS.forEach(column => {
+                    html += `<td data-column="${column}">${row[column] || ''}</td>`;
+                });
+                html += `</tr>`;
+            });
+            
+            tableBody.innerHTML = html;
+            addRowClickListeners();
+        }
+
         // Search functionality
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
-        const tableBody = document.getElementById('tableBody');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const tableContent = document.getElementById('tableContent');
         const searchResultsInfo = document.getElementById('searchResultsInfo');
-        const totalRecords = document.getElementById('totalRecords');
-        const nasaIframe = document.getElementById('nasaIframe');
-        const iframePlaceholder = document.getElementById('iframePlaceholder');
-        const selectedPlanet = document.getElementById('selectedPlanet');
-
-        // Dimension indicators
-        const dimensionToggle = document.getElementById('dimensionToggle');
-        const gifWidthIndicator = document.getElementById('gifWidthIndicator');
-        const gifHeightIndicator = document.getElementById('gifHeightIndicator');
-        const gifContainer = document.getElementById('gifContainer');
-
-        // Track dimension visibility
-        let dimensionsVisible = true;
-
-        // Toggle dimension indicators
-        dimensionToggle.addEventListener('click', function() {
-            dimensionsVisible = !dimensionsVisible;
-            
-            // Toggle all dimension indicators
-            const indicators = document.querySelectorAll('.dimension-indicator');
-            indicators.forEach(indicator => {
-                indicator.style.display = dimensionsVisible ? 'block' : 'none';
-            });
-            
-            // Toggle dashed borders
-            const containers = document.querySelectorAll('.visualization');
-            containers.forEach(container => {
-                container.style.border = dimensionsVisible ? '1px dashed rgba(255, 255, 255, 0.3)' : 'none';
-            });
-            
-            // Update button icon
-            const icon = this.querySelector('i');
-            icon.className = dimensionsVisible ? 'fas fa-ruler' : 'fas fa-eye-slash';
-        });
-
-        // Update dimension indicators on resize
-        function updateDimensions() {
-            const gifRect = gifContainer.getBoundingClientRect();
-            gifWidthIndicator.textContent = Math.round(gifRect.width) + 'px';
-            gifHeightIndicator.textContent = Math.round(gifRect.height) + 'px';
-        }
-
-        // Initial dimension update
-        updateDimensions();
-
-        // Update dimensions on window resize
-        window.addEventListener('resize', updateDimensions);
+        const totalRecordsEl = document.getElementById('totalRecords');
 
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const query = this.value.trim();
             
-            if (query.length === 0) {
-                window.location.reload();
-                return;
-            }
-
-            if (query.length < 2) return;
-
             loadingIndicator.style.display = 'block';
             tableContent.style.display = 'none';
             searchResultsInfo.style.display = 'none';
 
             searchTimeout = setTimeout(() => {
                 performSearch(query);
-            }, 500);
+            }, 300);
         });
 
         function performSearch(query) {
-            fetch(`/search?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-
-                    updateTable(data.data);
-                    updateSearchInfo(data.total_results, query);
-                    
-                    loadingIndicator.style.display = 'none';
-                    tableContent.style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    loadingIndicator.style.display = 'none';
-                    tableContent.style.display = 'block';
+            const lowerQuery = query.toLowerCase();
+            if (query.length === 0) {
+                filteredData = allData;
+            } else {
+                filteredData = allData.filter(row => {
+                    return Object.values(row).some(value => 
+                        String(value).toLowerCase().includes(lowerQuery)
+                    );
                 });
-        }
-
-        function updateTable(data) {
-            if (!tableBody) return;
-
-            if (data.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="100" style="text-align: center; padding: 40px; color: #b0b0ff;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                            <p>No results found for your search</p>
-                        </td>
-                    </tr>
-                `;
-                return;
             }
-
-            const columns = Array.isArray(VISIBLE_COLUMNS) && VISIBLE_COLUMNS.length ? VISIBLE_COLUMNS : Object.keys(data[0]);
             
-            let html = '';
-            data.forEach((row, rowIndex) => {
-                const actualEM = row['Actual EM'] || row['Actual EM '] || row['Actual_EM'];
-                const rowGif = row['gif'] || row['gif_url'] || '';
-                const rowNasa = row['nasa_url'] || row['nasa'] || '';
-                html += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}">`;
-                columns.forEach(column => {
-                    const value = row[column];
-                    let cellClass = '';
-                    if (column === 'Actual EM' || column === 'Actual EM ' || column === 'Actual_EM') {
-                        cellClass = 'actual-em-cell';
-                    } else if (value === actualEM) {
-                        cellClass = 'status-match';
-                    }
-                    html += `<td class="${cellClass}" data-column="${column}" data-value="${value}" data-actual-em="${actualEM}" data-row-index="${rowIndex}">${value}</td>`;
-                });
-                html += `</tr>`;
-            });
+            totalPages = Math.ceil(filteredData.length / recordsPerPage);
+            currentPage = 1;
             
-            tableBody.innerHTML = html;
+            renderTable();
+            updatePaginationControls();
+            renderPageNumbers();
+            updateSearchInfo(filteredData.length, query);
             
-            addRowClickListeners();
+            loadingIndicator.style.display = 'none';
+            tableContent.style.display = 'block';
         }
 
         function updateSearchInfo(totalResults, query) {
-            if (totalResults === 0) {
-                searchResultsInfo.innerHTML = `No results found for "${query}"`;
-            } else {
+            if (query.length > 0) {
                 searchResultsInfo.innerHTML = `Found ${totalResults} result${totalResults !== 1 ? 's' : ''} for "${query}"`;
+                searchResultsInfo.style.display = 'block';
+            } else {
+                searchResultsInfo.style.display = 'none';
             }
-            searchResultsInfo.style.display = 'block';
-            totalRecords.textContent = totalResults;
+            totalRecordsEl.textContent = totalResults;
         }
 
         function addRowClickListeners() {
@@ -1088,48 +1125,32 @@
                 row.addEventListener('click', function() {
                     rows.forEach(r => r.classList.remove('selected'));
                     this.classList.add('selected');
-                    
                     updateNasaIframe(this);
-                    
-                    const gifUrl = this.getAttribute('data-gif') || '';
-                    const gifImgEl = document.getElementById('gifImg');
-                    const gifPlaceholderEl = document.getElementById('gifPlaceholder');
-                    if (gifImgEl) {
-                        if (gifUrl) {
-                            gifImgEl.src = gifUrl;
-                            gifImgEl.style.display = 'block';
-                            if (gifPlaceholderEl) gifPlaceholderEl.style.display = 'none';
-                        } else {
-                            gifImgEl.src = '';
-                            gifImgEl.style.display = 'none';
-                            if (gifPlaceholderEl) gifPlaceholderEl.style.display = 'flex';
-                        }
-                    }
+                    updateGifVisualization(this);
                 });
             });
         }
 
         function updateNasaIframe(selectedRow) {
+            const nasaIframe = document.getElementById('nasaIframe');
+            const iframePlaceholder = document.getElementById('iframePlaceholder');
+            const selectedPlanet = document.getElementById('selectedPlanet');
             const nasaUrl = selectedRow.getAttribute('data-nasa') || '';
-            const cells = selectedRow.querySelectorAll('td');
             let planetName = '';
             
-            cells.forEach(cell => {
+            selectedRow.querySelectorAll('td').forEach(cell => {
                 const column = cell.getAttribute('data-column');
-                if (column && ['Planet', 'planet', 'Name', 'name'].includes(column)) {
+                if (column && ['kepler_name', 'Planet', 'planet', 'Name', 'name'].includes(column)) {
                     planetName = cell.textContent.trim();
                 }
             });
             
             const isValidUrl = nasaUrl && /^https?:\/\//i.test(nasaUrl);
             
-            if (nasaUrl && isValidUrl) {
-                iframePlaceholder.innerHTML = `
-                    <i class="fas fa-spinner fa-spin" style="font-size: 4rem; color: #6c63ff; margin-bottom: 20px;"></i>
-                    <h3>Loading NASA Data for ${planetName || 'Selected Planet'}</h3>
-                `;
-                iframePlaceholder.style.display = 'flex';
+            if (isValidUrl) {
                 nasaIframe.style.display = 'none';
+                iframePlaceholder.style.display = 'flex';
+                iframePlaceholder.innerHTML = `<i class="fas fa-spinner fa-spin"></i><h3>Loading NASA Data...</h3>`;
                 
                 nasaIframe.src = nasaUrl;
                 
@@ -1137,114 +1158,89 @@
                     nasaIframe.style.display = 'block';
                     iframePlaceholder.style.display = 'none';
                     selectedPlanet.textContent = `Viewing: ${planetName || 'Selected Planet'}`;
-                    selectedPlanet.style.color = '#6c63ff';
-                };
-                nasaIframe.onerror = () => {
-                    nasaIframe.style.display = 'none';
-                    iframePlaceholder.innerHTML = `
-                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;"></i>
-                        <h3>No NASA Data Available for ${planetName || 'Selected Planet'}</h3>
-                        <p>The provided URL could not be loaded.</p>
-                    `;
-                    iframePlaceholder.style.display = 'flex';
-                    selectedPlanet.textContent = `No NASA Data Available for ${planetName || 'Selected Planet'}`;
-                    selectedPlanet.style.color = '#ff6b6b';
                 };
             } else {
                 nasaIframe.style.display = 'none';
-                iframePlaceholder.innerHTML = `
-                    <i class="fas fa-globe-americas" style="font-size: 4rem; color: #6c63ff; margin-bottom: 20px;"></i>
-                    <h3>No NASA Data Available for ${planetName || 'Selected Planet'}</h3>
-                    <p>No NASA URL provided for this planet.</p>
-                `;
                 iframePlaceholder.style.display = 'flex';
-                selectedPlanet.textContent = `No NASA Data Available for ${planetName || 'Selected Planet'}`;
-                selectedPlanet.style.color = '#ff6b6b';
+                iframePlaceholder.innerHTML = `<i class="fas fa-globe-americas"></i><h3>No NASA Data Available</h3><p>No valid URL for ${planetName || 'this planet'}.</p>`;
+                selectedPlanet.textContent = 'No NASA Data Available';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            addRowClickListeners();
-            
-            const firstRow = document.querySelector('#tableBody tr');
-            if (firstRow) {
-                firstRow.classList.add('selected');
-                updateNasaIframe(firstRow);
+        function updateGifVisualization(selectedRow) {
+            const gifUrl = selectedRow.getAttribute('data-gif');
+            const gifImg = document.getElementById('gifImg');
+            const gifPlaceholder = document.getElementById('gifPlaceholder');
+            const gifControls = document.querySelector('.gif-controls');
+
+            if (gifUrl) {
+                gifImg.src = gifUrl;
+                gifImg.style.display = 'block';
+                gifPlaceholder.style.display = 'none';
+                gifControls.style.display = 'flex';
+            } else {
+                gifImg.src = '';
+                gifImg.style.display = 'none';
+                gifPlaceholder.style.display = 'flex';
+                gifControls.style.display = 'none';
             }
-        });
+        }
 
         // GIF controls
         (function(){
-            const gifImg = document.getElementById('gifImg');
-            const gifPlaceholder = document.getElementById('gifPlaceholder');
             const playButton = document.getElementById('playButton');
             const pauseButton = document.getElementById('pauseButton');
-            const dragButton = document.getElementById('dragButton');
-            let currentKepid = '';
-            let dragMode = false;
-            let isDragging = false;
-            const dragOffset = { x: 0, y: 0 };
-
-            function setGifSrc(kepid) {
-                if (!kepid) return;
-                currentKepid = kepid;
-                const path = `/gifs/${kepid}.gif`;
-                gifImg.src = path;
-                gifImg.style.display = 'block';
-                gifPlaceholder.style.display = 'none';
-            }
-
-            function clearGif() {
-                gifImg.src = '';
-                gifImg.style.display = 'none';
-                gifPlaceholder.style.display = 'flex';
-                currentKepid = '';
-            }
+            const gifImg = document.getElementById('gifImg');
 
             playButton.addEventListener('click', () => {
-                if (!currentKepid) return;
-                const path = `/gifs/${currentKepid}.gif`;
+                const currentSrc = gifImg.src;
+                if (!currentSrc) return;
+                // Re-assign src to restart the GIF
                 gifImg.src = '';
-                setTimeout(() => gifImg.src = path, 20);
-                gifImg.style.display = 'block';
-                gifPlaceholder.style.display = 'none';
+                gifImg.src = currentSrc;
             });
 
             pauseButton.addEventListener('click', () => {
-                gifImg.src = '';
-                gifImg.style.display = 'none';
-                gifPlaceholder.style.display = 'flex';
-            });
-
-            dragButton.addEventListener('click', () => {
-                dragMode = !dragMode;
-                dragButton.textContent = dragMode ? 'Stop Drag' : 'Drag';
-                gifContainer.style.cursor = dragMode ? 'grab' : 'default';
-            });
-
-            gifContainer.addEventListener('pointerdown', (ev) => {
-                if (!dragMode) return;
-                isDragging = true;
-                gifContainer.setPointerCapture(ev.pointerId);
-                const rect = gifContainer.getBoundingClientRect();
-                dragOffset.x = ev.clientX - rect.left;
-                dragOffset.y = ev.clientY - rect.top;
-                gifContainer.style.position = 'fixed';
-                gifContainer.style.zIndex = 9999;
-            });
-
-            window.addEventListener('pointermove', (ev) => {
-                if (!isDragging) return;
-                gifContainer.style.left = (ev.clientX - dragOffset.x) + 'px';
-                gifContainer.style.top = (ev.clientY - dragOffset.y) + 'px';
-            });
-
-            window.addEventListener('pointerup', (ev) => {
-                if (!isDragging) return;
-                isDragging = false;
-                try { gifContainer.releasePointerCapture(ev.pointerId); } catch(e){}
+                // This is a trick: to "pause" a GIF, we can replace it with a canvas showing the current frame.
+                // For simplicity here, we'll just clear it. A true pause is complex.
+                gifImg.src = ''; 
             });
         })();
+
+        // Pagination button event listeners
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                updatePaginationControls();
+                renderPageNumbers();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                updatePaginationControls();
+                renderPageNumbers();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial data load is handled by server-side rendering
+            allData = {{ data|tojson }};
+            filteredData = allData;
+            totalPages = Math.ceil(filteredData.length / recordsPerPage);
+            
+            initializePagination();
+            addRowClickListeners();
+
+            const firstRow = document.querySelector('#tableBody tr');
+            if (firstRow) {
+                firstRow.click();
+            }
+        });
     </script>
 </body>
 </html>
