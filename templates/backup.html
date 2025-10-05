@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanet Explorer - Data Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0e2a 0%, #1a1d4e 100%);
+            color: #e0e0ff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 12, 35, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #6c63ff;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #b0b0ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: #6c63ff;
+        }
+
+        nav a.active {
+            color: #6c63ff;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        .dashboard-hero {
+            padding: 60px 0 30px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
+        }
+
+        .dashboard-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #e0e0ff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: #e0e0ff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #6c63ff;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b0b0ff;
+            font-size: 1.2rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6c63ff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #b0b0ff;
+            font-size: 0.9rem;
+        }
+
+        .data-section {
+            padding: 40px 0;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table th {
+            background: rgba(108, 99, 255, 0.2);
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #e0e0ff;
+            border-bottom: 2px solid rgba(108, 99, 255, 0.5);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .data-table th:hover {
+            background: rgba(108, 99, 255, 0.3);
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b0b0ff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Selected row styling */
+        .data-table tr.selected {
+            background: white !important;
+        }
+
+        .data-table tr.selected td {
+            color: #1a1d4e !important;
+            font-weight: 600;
+        }
+
+        /* Status styling */
+        .status-match {
+            background: rgba(16, 185, 129, 0.3) !important;
+            color: #10b981 !important;
+            font-weight: 600;
+        }
+
+        .actual-em-cell {
+            background: rgba(16, 185, 129, 0.4) !important;
+            color: #10b981 !important;
+            font-weight: 700;
+            border: 2px solid #10b981 !important;
+        }
+
+        /* NASA Iframe Section */
+        .nasa-section {
+            margin: 40px 0;
+        }
+
+        .nasa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+
+        .nasa-title {
+            font-size: 1.5rem;
+            color: #e0e0ff;
+            font-weight: 600;
+        }
+
+        .selected-planet {
+            color: #6c63ff;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .iframe-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 600px;
+            position: relative;
+        }
+
+        .nasa-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .iframe-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #b0b0ff;
+            text-align: center;
+        }
+
+        .iframe-placeholder i {
+            font-size: 4rem;
+            color: #6c63ff;
+            margin-bottom: 20px;
+        }
+
+        .iframe-placeholder h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #e0e0ff;
+        }
+
+        /* GitHub Section */
+        .github-section {
+            margin: 40px 0;
+        }
+
+        .github-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .github-title {
+            font-size: 1.5rem;
+            color: #e0e0ff;
+            font-weight: 600;
+        }
+
+        .github-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .github-stat {
+            background: rgba(108, 99, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #b0b0ff;
+        }
+
+        .github-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .github-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .github-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .github-description {
+            color: #b0b0ff;
+            line-height: 1.6;
+        }
+
+        .github-features {
+            list-style: none;
+        }
+
+        .github-features li {
+            margin-bottom: 10px;
+            color: #b0b0ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .github-features li i {
+            color: #10b981;
+        }
+
+        .github-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            text-decoration: none;
+            color: #e0e0ff;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .github-link:hover {
+            background: rgba(108, 99, 255, 0.2);
+            transform: translateY(-2px);
+            border-color: #6c63ff;
+        }
+
+        .github-link i {
+            font-size: 1.5rem;
+            color: #6c63ff;
+        }
+
+        .github-link-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #e0e0ff;
+        }
+
+        .github-link-content p {
+            font-size: 0.9rem;
+            color: #b0b0ff;
+            margin: 0;
+        }
+
+        .search-results-info {
+            text-align: center;
+            margin: 20px 0;
+            color: #b0b0ff;
+            font-style: italic;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .error-message i {
+            font-size: 2rem;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #b0b0ff;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            color: #6c63ff;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #b0b0ff;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: #6c63ff;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            margin-top: 60px;
+            background: rgba(5, 7, 25, 0.9);
+            padding: 60px 0 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo i {
+            font-size: 24px;
+            color: #6c63ff;
+        }
+
+        .footer-logo h3 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            color: #b0b0ff;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .dashboard-hero h2 {
+                font-size: 2rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                min-width: 1000px;
+            }
+            
+            .nasa-header,
+            .github-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .iframe-container {
+                height: 400px;
+            }
+            
+            .github-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .github-stats {
+                justify-content: center;
+            }
+        }
+
+        /* Visualization Container */
+        .visualization-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .visualization {
+            flex: 1;
+            margin-right: 20px;
+            position: relative;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .visualization-iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        /* Figma-style dimension indicators */
+        .dimension-indicator {
+            position: absolute;
+            background: rgba(108, 99, 255, 0.8);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            z-index: 10;
+            font-weight: 500;
+        }
+
+        .width-indicator {
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .height-indicator {
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+        }
+
+        /* Gemini Chat Box */
+        .gemini-chat {
+            width: 300px;
+            height: 400px;
+            background: rgba(10, 12, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            padding: 10px;
+        }
+
+        .gemini-header {
+            background: rgba(108, 99, 255, 0.8);
+            padding: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .gemini-body {
+            flex: 1;
+            padding: 10px;
+            color: #b0b0ff;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .gemini-footer {
+            display: flex;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .gemini-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0ff;
+            font-size: 0.9rem;
+        }
+
+        .gemini-send-btn {
+            padding: 10px;
+            background: #6c63ff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Toggle for dimension indicators */
+        .dimension-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Green background for matching cells */
+        .match-cell {
+            background: rgba(16, 185, 129, 0.3); /* Light green */
+            color: #10b981; /* Green text */
+            font-weight: bold;
+        }
+
+        /* Red background for mismatched cells */
+        .mismatch-cell {
+            background: rgba(220, 38, 38, 0.3); /* Light red */
+            color: #dc2626; /* Red text */
+            font-weight: bold;
+        }
+
+        /* Styling for the Actual column */
+        .actual-cell {
+            background: rgba(59, 130, 246, 0.3); /* Light blue */
+            color: #3b82f6; /* Blue text */
+            font-weight: bold;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-globe-americas"></i>
+                    <h1>Exoplanet Explorer</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/dashboard" class="active">Dashboard</a></li>
+                        <li><a href="#">Research</a></li>
+                        <li><a href="#">Resources</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="dashboard-hero">
+        <div class="container">
+            <h2>Exoplanet Data Dashboard</h2>
+            <p>Explore and analyze exoplanet data from our comprehensive database</p>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search across all columns...">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Data</h3>
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <div id="searchResultsInfo" class="search-results-info" style="display: none;"></div>
+
+        {% if stats %}
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRecords">{{ stats.total_rows }}</div>
+                <div class="stat-label">Total Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_columns }}</div>
+                <div class="stat-label">Data Columns</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.column_names|length }}</div>
+                <div class="stat-label">Features Tracked</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <section class="data-section">
+            <div class="table-container">
+                <div id="loadingIndicator" class="loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Searching data...</p>
+                </div>
+
+                <div id="tableContent">
+                    {% if data %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                {% for column in columns %}
+                                <th>{{ column }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            {% for row in data %}
+                            <tr
+                                data-gif="{{ row['gif'] if row.get('gif') else '' }}"
+                                data-nasa="{{ row['nasa_url'] if row.get('nasa_url') else '' }}">
+                                 {% for column in columns %}
+                                 <td data-column="{{ column }}">{{ row[column] }}</td>
+                                 {% endfor %}
+                             </tr>
+                             {% endfor %}
+                    </tbody>
+                    </table>
+                    {% else %}
+                    <div class="no-data">
+                        <i class="fas fa-database"></i>
+                        <h3>No Data Available</h3>
+                        <p>Please ensure your data.csv file is in the correct location and format.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination" style="text-align: right; margin-top: 20px;">
+                    {% if stats.total_pages > 1 %}
+                    <nav>
+                        <ul style="list-style: none; display: inline-flex; gap: 10px; padding: 0;">
+                            {% for page_num in range(1, stats.total_pages + 1) %}
+                            <li>
+                                <a href="/dashboard?page={{ page_num }}"
+                                   style="padding: 5px 10px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; text-decoration: none; color: {% if page_num == stats.current_page %}#6c63ff{% else %}#b0b0ff{% endif %}; background: {% if page_num == stats.current_page %}rgba(108, 99, 255, 0.2){% endif %};">
+                                   {{ page_num }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- NASA Exoplanet Iframe Section -->
+        <section class="nasa-section">
+            <div class="nasa-header">
+                <div class="nasa-title">
+                    <i class="fas fa-satellite"></i>
+                    NASA Exoplanet Exploration
+                </div>
+                <div class="selected-planet" id="selectedPlanet">
+                    Select a planet to view details
+                </div>
+            </div>
+            <div class="iframe-container">
+                <div id="iframePlaceholder" class="iframe-placeholder">
+                    <i class="fas fa-globe-americas"></i>
+                    <h3>No Planet Selected</h3>
+                    <p>Click on a row in the table above to view NASA exoplanet data</p>
+                </div>
+                <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" 
+                        src=""
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
+        <div class="visualization-container">
+          <!-- GIF Visualization -->
+          <div class="visualization" id="gifContainer" style="position: relative;">
+            <div class="dimension-indicator width-indicator" id="gifWidthIndicator">800px</div>
+            <div class="dimension-indicator height-indicator" id="gifHeightIndicator">600px</div>
+            <!-- fixed-size visualization container (738 x 861 px) centered -->
+            <div class="w-full h-screen" style="height: 861px; width: 738px; margin: 0 auto; position: relative;">
+               <!-- fixed-size GIF frame (738 x 861 px) centered -->
+               <div style="width: 738px; height: 861px; margin: 0 auto; position: relative;">
+                 <!-- start without src; will update when user clicks a row -->
+                 <iframe
+                   id="gifIframe"
+                   src=""
+                   width="738"
+                   height="861"
+                   style="border: none; width: 738px; height: 861px; display: none; border-radius: 6px; background: #000;"
+                   title="GIF Visualization"
+                   aria-hidden="true">
+                 </iframe>
+
+                 <!-- Keep an <img> fallback used by JS (if present) -->
+                 <img id="gifImg" src="" alt="GIF Visualization"
+                     width="738" height="861"
+                     style="display: none; width: 738px; height: 861px; border-radius: 6px; object-fit: contain;">
+
+                 <!-- Placeholder sized exactly 738x861 so layout never shifts -->
+                 <div id="gifPlaceholder"
+                     class="iframe-placeholder"
+                     style="position: absolute; left: 0; top: 0; width: 738px; height: 861px; display:flex; align-items:center; justify-content:center; border-radius:6px;">
+                  <div style="text-align:center; color:#b0b0ff; width:100%;">
+                    <i class="fas fa-image" style="font-size:2.5rem; color:#6c63ff; display:block; margin-bottom:10px;"></i>
+                    <div>No GIF selected</div>
+                  </div>
+                </div>
+ 
+                 <!-- Controls (positioned relative to the fixed-size frame) -->
+                 <div class="gif-controls" style="position: absolute; bottom: 12px; left: 12px; display: flex; gap: 10px; z-index: 10;">
+                   <button id="playButton" class="control-btn">Play</button>
+                   <button id="pauseButton" class="control-btn">Pause</button>
+                   <button id="dragButton" class="control-btn">Drag</button>
+                 </div>
+               </div>
+              </div>
+          </div>
+
+         
+        </div>
+
+        <!-- GitHub Section -->
+        <section class="github-section">
+            <div class="github-header">
+                <div class="github-title">
+                    <i class="fab fa-github"></i>
+                    Project Repository
+                </div>
+                <div class="github-stats">
+                    <div class="github-stat">
+                        <i class="fas fa-code-branch"></i>
+                        Open Source
+                    </div>
+                    <div class="github-stat">
+                        <i class="fas fa-star"></i>
+                        MIT License
+                    </div>
+                </div>
+            </div>
+            <div class="github-container">
+                <div class="github-content">
+                    <div class="github-info">
+                        <div class="github-description">
+                            <p>This exoplanet exploration dashboard is an open-source project dedicated to making exoplanet data accessible and interactive for researchers, students, and astronomy enthusiasts.</p>
+                            <p>Explore the code, contribute to the project, or use the data for your own research.</p>
+                        </div>
+                        <ul class="github-features">
+                            <li><i class="fas fa-check"></i> Real-time exoplanet data analysis</li>
+                            <li><i class="fas fa-check"></i> Interactive NASA visualizations</li>
+                            <li><i class="fas fa-check"></i> Machine learning predictions</li>
+                            <li><i class="fas fa-check"></i> Open data and open source</li>
+                            <li><i class="fas fa-check"></i> Community-driven development</li>
+                        </div>
+                    </div>
+                    <div class="github-links">
+                        <a href="https://github.com/your-username/exoplanet-explorer" class="github-link" target="_blank">
+                            <i class="fab fa-github"></i>
+                            <div class="github-link-content">
+                                <h4>Main Repository</h4>
+                                <p>View source code and documentation</p>
+                            </div>
+                        </a>
+                        <a href="https://github.com/your-username/exoplanet-explorer/issues" class="github-link" target="_blank">
+                            <i class="fas fa-bug"></i>
+                            <div class="github-link-content">
+                                <h4>Report Issues</h4>
+                                <p>Found a bug? Let us know</p>
+                            </div>
+                        </a>
+                        <a href="https://github.com/your-username/exoplanet-explorer/pulls" class="github-link" target="_blank">
+                            <i class="fas fa-code-pull-request"></i>
+                            <div class="github-link-content">
+                                <h4>Contribute</h4>
+                                <p>Submit pull requests and improvements</p>
+                            </div>
+                        </a>
+                        <a href="https://github.com/your-username/exoplanet-explorer/wiki" class="github-link" target="_blank">
+                            <i class="fas fa-book"></i>
+                            <div class="github-link-content">
+                                <h4>Documentation</h4>
+                                <p>Read the project wiki and guides</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fas fa-globe-americas"></i>
+                        <h3>Exoplanet Explorer</h3>
+                    </div>
+                    <p>Your gateway to discovering worlds beyond our solar system with the latest research and data.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/dashboard">Data Dashboard</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="#">Research Papers</a></li>
+                        <li><a href="#">Mission Updates</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Dimension Toggle Button -->
+    <button class="dimension-toggle" id="dimensionToggle">
+        <i class="fas fa-ruler"></i>
+    </button>
+
+    <script>
++        // Make visible columns available to client JS (used by updateTable)
++        const VISIBLE_COLUMNS = {{ columns|tojson }};
+         // Update copyright year automatically
+         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Search functionality
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const tableBody = document.getElementById('tableBody');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const tableContent = document.getElementById('tableContent');
+        const searchResultsInfo = document.getElementById('searchResultsInfo');
+        const totalRecords = document.getElementById('totalRecords');
+        const nasaIframe = document.getElementById('nasaIframe');
+        const iframePlaceholder = document.getElementById('iframePlaceholder');
+        const selectedPlanet = document.getElementById('selectedPlanet');
+
+        // Dimension indicators
+        const dimensionToggle = document.getElementById('dimensionToggle');
+        const gifWidthIndicator = document.getElementById('gifWidthIndicator');
+        const gifHeightIndicator = document.getElementById('gifHeightIndicator');
+        const chatWidthIndicator = document.getElementById('chatWidthIndicator');
+        const chatHeightIndicator = document.getElementById('chatHeightIndicator');
+        const gifContainer = document.getElementById('gifContainer');
+        const geminiChat = document.getElementById('geminiChat');
+
+        // Track dimension visibility
+        let dimensionsVisible = true;
+
+        // Toggle dimension indicators
+        dimensionToggle.addEventListener('click', function() {
+            dimensionsVisible = !dimensionsVisible;
+            
+            // Toggle all dimension indicators
+            const indicators = document.querySelectorAll('.dimension-indicator');
+            indicators.forEach(indicator => {
+                indicator.style.display = dimensionsVisible ? 'block' : 'none';
+            });
+            
+            // Toggle dashed borders
+            const containers = document.querySelectorAll('.visualization, .gemini-chat');
+            containers.forEach(container => {
+                container.style.border = dimensionsVisible ? '1px dashed rgba(255, 255, 255, 0.3)' : 'none';
+            });
+            
+            // Update button icon
+            const icon = this.querySelector('i');
+            icon.className = dimensionsVisible ? 'fas fa-eye-slash' : 'fas fa-ruler';
+        });
+
+        // Update dimension indicators on resize
+        function updateDimensions() {
+            // GIF dimensions
+            const gifRect = gifContainer.getBoundingClientRect();
+            gifWidthIndicator.textContent = Math.round(gifRect.width) + 'px';
+            gifHeightIndicator.textContent = Math.round(gifRect.height) + 'px';
+            
+            // Chat dimensions
+            const chatRect = geminiChat.getBoundingClientRect();
+            chatWidthIndicator.textContent = Math.round(chatRect.width) + 'px';
+            chatHeightIndicator.textContent = Math.round(chatRect.height) + 'px';
+        }
+
+        // Initial dimension update
+        updateDimensions();
+
+        // Update dimensions on window resize
+        window.addEventListener('resize', updateDimensions);
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length === 0) {
+                // Reload the page to show all data
+                window.location.reload();
+                return;
+            }
+
+            if (query.length < 2) return;
+
+            loadingIndicator.style.display = 'block';
+            tableContent.style.display = 'none';
+            searchResultsInfo.style.display = 'none';
+
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 500);
+        });
+
+        function performSearch(query) {
+            fetch(`/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    updateTable(data.data);
+                    updateSearchInfo(data.total_results, query);
+                    
+                    loadingIndicator.style.display = 'none';
+                    tableContent.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    loadingIndicator.style.display = 'none';
+                    tableContent.style.display = 'block';
+                });
+        }
+
+        function updateTable(data) {
+             if (!tableBody) return;
+ 
+             if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="100" style="text-align: center; padding: 40px; color: #b0b0ff;">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>No results found for your search</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Use server-provided visible columns for display
+            const columns = Array.isArray(VISIBLE_COLUMNS) && VISIBLE_COLUMNS.length ? VISIBLE_COLUMNS : Object.keys(data[0]);
+            
+            let html = '';
+            data.forEach((row, rowIndex) => {
+                 const actualEM = row['Actual EM'] || row['Actual EM '] || row['Actual_EM'];
+                 // Attach gif url to row element via data attribute (row.gif may be full URL or relative)
+                 const rowGif = row['gif'] || row['gif_url'] || '';
+                 const rowNasa = row['nasa_url'] || row['nasa'] || '';
+                 // start row with data attributes so click handler can read gif + nasa_url
+                 html += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}">`;
+                 columns.forEach(column => {
+                    const value = row[column];
+                    
+                    // Determine cell classes
+                    let cellClass = '';
+                    
+                    // Always highlight Actual EM column
+                    if (column === 'Actual EM' || column === 'Actual EM ' || column === 'Actual_EM') {
+                        cellClass = 'actual-em-cell';
+                    } 
+                    // Highlight if value matches Actual EM for this row
+                    else if (value === actualEM) {
+                        cellClass = 'status-match';
+                    }
+                    
+                    html += `<td class="${cellClass}" data-column="${column}" data-value="${value}" data-actual-em="${actualEM}" data-row-index="${rowIndex}">${value}</td>`;
+                });
+                html += `</tr>`;
+            });
+            
+             tableBody.innerHTML = html;
+            
+             // Add click event listeners to new rows
+             addRowClickListeners();
+         }
+
+        function updateSearchInfo(totalResults, query) {
+            if (totalResults === 0) {
+                searchResultsInfo.innerHTML = `No results found for "${query}"`;
+            } else {
+                searchResultsInfo.innerHTML = `Found ${totalResults} result${totalResults !== 1 ? 's' : ''} for "${query}"`;
+            }
+            searchResultsInfo.style.display = 'block';
+            totalRecords.textContent = totalResults;
+        }
+
+        // Row selection functionality
+        function addRowClickListeners() {
+             const rows = document.querySelectorAll('#tableBody tr');
+             rows.forEach(row => {
+                 row.addEventListener('click', function() {
+                     // Remove selected class from all rows
+                     rows.forEach(r => r.classList.remove('selected'));
+                     // Add selected class to clicked row
+                     this.classList.add('selected');
+                     
+                     // Update NASA iframe with selected planet (will use nasa_url if present)
+                     updateNasaIframe(this);
+                     // Load GIF into GIF area (img or iframe). keep GIF logic independent of NASA iframe.
+                     const gifUrl = this.getAttribute('data-gif') || '';
+                     const gifImgEl = document.getElementById('gifImg');
+                     const gifPlaceholderEl = document.getElementById('gifPlaceholder');
+                     if (gifImgEl) {
+                         if (gifUrl) {
+                             gifImgEl.src = gifUrl;
+                             gifImgEl.style.display = 'block';
+                             if (gifPlaceholderEl) gifPlaceholderEl.style.display = 'none';
+                         } else {
+                             gifImgEl.src = '';
+                             gifImgEl.style.display = 'none';
+                             if (gifPlaceholderEl) gifPlaceholderEl.style.display = 'flex';
+                         }
+                     }
+                 });
+             });
+         }
+
+        function updateNasaIframe(selectedRow) {
+            const cells = selectedRow.querySelectorAll('td');
+            let planetName = '';
+            
+            // Find the planet name (assuming it's in a column named 'Planet')
+            cells.forEach(cell => {
+                const column = cell.getAttribute('data-column');
+                if (column === 'Planet' || column === 'planet' || column === 'Name' || column === 'name') {
+                    planetName = cell.textContent.trim();
+                }
+            });
+            
+            if (planetName) {
+                // Format planet name for NASA URL (replace spaces with underscores)
+                const formattedPlanetName = planetName.replace(/ /g, '_').replace(/-/g, '_');
+                const nasaUrl = `https://eyes.nasa.gov/apps/exo/#/planet/${formattedPlanetName}`;
+                
+                // Update iframe source
+                nasaIframe.src = nasaUrl;
+                nasaIframe.style.display = 'block';
+                iframePlaceholder.style.display = 'none';
+                
+                // Update selected planet text
+                selectedPlanet.textContent = `Viewing: ${planetName}`;
+                selectedPlanet.style.color = '#6c63ff';
+            } else {
+                // No planet name found
+                nasaIframe.style.display = 'none';
+                iframePlaceholder.style.display = 'flex';
+                selectedPlanet.textContent = 'Select a planet to view details';
+                selectedPlanet.style.color = '#b0b0ff';
+            }
+        }
+
+        // Initialize row click listeners on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            addRowClickListeners();
+            
+            // Select first row by default and load its NASA data
+            const firstRow = document.querySelector('#tableBody tr');
+            if (firstRow) {
+                firstRow.classList.add('selected');
+                updateNasaIframe(firstRow);
+            }
+        });
+
+        // GIF selection + controls
+        (function(){
+            const gifImg = document.getElementById('gifImg');
+            const gifPlaceholder = document.getElementById('gifPlaceholder');
+            let currentKepid = '';
+
+            function setGifSrc(kepid) {
+                if (!kepid) return;
+                currentKepid = kepid;
+                const path = `/gifs/${kepid}.gif`;
+                gifImg.src = path;
+                gifImg.style.display = 'block';
+                gifPlaceholder.style.display = 'none';
+            }
+
+            function clearGif() {
+                gifImg.src = '';
+                gifImg.style.display = 'none';
+                gifPlaceholder.style.display = 'flex';
+                currentKepid = '';
+            }
+
+            // Play = reload current gif
+            playButton.addEventListener('click', () => {
+                if (!currentKepid) return;
+                const path = `/gifs/${currentKepid}.gif`;
+                gifImg.src = '';
+                setTimeout(() => gifImg.src = path, 20);
+                gifImg.style.display = 'block';
+                gifPlaceholder.style.display = 'none';
+            });
+
+            // Pause = blank the image (keeps currentKepid so play can resume)
+            pauseButton.addEventListener('click', () => {
+                gifImg.src = '';
+                gifImg.style.display = 'none';
+                gifPlaceholder.style.display = 'flex';
+            });
+
+            // Drag toggle
+            dragButton.addEventListener('click', () => {
+                dragMode = !dragMode;
+                dragButton.textContent = dragMode ? 'Stop Drag' : 'Drag';
+                gifContainer.style.cursor = dragMode ? 'grab' : 'default';
+            });
+
+            // Pointer-based dragging
+            gifContainer.addEventListener('pointerdown', (ev) => {
+                if (!dragMode) return;
+                isDragging = true;
+                gifContainer.setPointerCapture(ev.pointerId);
+                const rect = gifContainer.getBoundingClientRect();
+                dragOffset.x = ev.clientX - rect.left;
+                dragOffset.y = ev.clientY - rect.top;
+                gifContainer.style.position = 'fixed';
+                gifContainer.style.zIndex = 9999;
+            });
+            window.addEventListener('pointermove', (ev) => {
+                if (!isDragging) return;
+                gifContainer.style.left = (ev.clientX - dragOffset.x) + 'px';
+                gifContainer.style.top = (ev.clientY - dragOffset.y) + 'px';
+            });
+            window.addEventListener('pointerup', (ev) => {
+                if (!isDragging) return;
+                isDragging = false;
+                try { gifContainer.releasePointerCapture(ev.pointerId); } catch(e){}
+            });
+
+        })();
+    </script>
+</body>
+</html>

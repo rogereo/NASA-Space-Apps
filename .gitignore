@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# IDE and Editor Folders
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Local configuration files
+.env
+*.env
+
+# Instance folder for Flask
+instance/
+
+# Large media files (optional but recommended)
+# If your gifs folder is large, uncomment the line below
+# gifs/

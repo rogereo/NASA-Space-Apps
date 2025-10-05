@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Exoplanet Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Copy of index.html styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0c0e2a 0%, #1a1d4e 100%);
+            color: #e0e0ff;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 12, 35, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i {
+            font-size: 28px;
+            color: #6c63ff;
+        }
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        nav a {
+            color: #b0b0ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        nav a:hover {
+            color: #6c63ff;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            transition: width 0.3s;
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+        .about-section {
+            padding: 100px 0 60px 0;
+            text-align: center;
+        }
+        .about-section h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #e0e0ff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        .about-section p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #b0b0ff;
+        }
+        .about-team {
+            margin-top: 60px;
+        }
+        .about-team h3 {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #e0e0ff;
+        }
+        .team-cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .team-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+            border-color: rgba(108, 99, 255, 0.5);
+        }
+        .team-card-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c63ff, #a855f7);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        .team-card-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e0e0ff;
+            margin-bottom: 5px;
+        }
+        .team-card-role {
+            font-size: 0.95rem;
+            color: #b0b0ff;
+        }
+        footer {
+            margin-top: auto;
+            background: rgba(5, 7, 25, 0.9);
+            padding: 60px 0 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .footer-logo i {
+            font-size: 24px;
+            color: #6c63ff;
+        }
+        .footer-logo h3 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .footer-about p {
+            color: #b0b0ff;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #e0e0ff;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        .footer-links a {
+            color: #b0b0ff;
+            text-decoration: none;
+            transition: color 0.3s, transform 0.3s;
+            display: inline-block;
+        }
+        .footer-links a:hover {
+            color: #6c63ff;
+            transform: translateX(5px);
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            color: #b0b0ff;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: linear-gradient(90deg, #6c63ff, #a855f7);
+            color: white;
+            transform: translateY(-3px);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            color: #b0b0ff;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            nav ul {
+                gap: 15px;
+            }
+            .about-section h2 {
+                font-size: 2.2rem;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-globe-americas"></i>
+                    <h1>Exoplanet Explorer</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#">Discoveries</a></li>
+                        <li><a href="#">Research</a></li>
+                        <li><a href="#">Resources</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="about-section">
+        <div class="container">
+            <h2>About Exoplanet Explorer</h2>
+            <p>Exoplanet Explorer lets users explore how machine learning models perform on real exoplanet data from NASA’s Kepler mission. We trained four models — Gradient Boosting, Random Forest, XGBoost, and LightGBM — using Kepler Objects of Interest. Along with model results, users can view interactive 3D visualizations of planets, stars, and their orbits. For instance, the Kepler-227 system shows a Neptune-like planet orbiting a G-type star.</p>
+            <p>The project enhances its dataset by using the LightKurve API to extract raw star light data, which is then attached to the KOI entries, allowing users to watch a time-lapse 3D view of these light changes over time to reveal patterns from planets or stellar activity.</p>
+            <div class="about-team">
+                <h3>Our Team</h3>
+                <div class="team-cards-container">
+                    <div class="team-card">
+                        <div class="team-card-avatar">
+                            <i class="fas fa-user-astronaut"></i>
+                        </div>
+                        <h4 class="team-card-name">Roger Arendse</h4>
+                        <p class="team-card-role">Project Contributor</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-card-avatar">
+                            <i class="fas fa-user-ninja"></i>
+                        </div>
+                        <h4 class="team-card-name">Leon Motaung</h4>
+                        <p class="team-card-role">Project Contributor</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-card-avatar">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <h4 class="team-card-name">Laren Cloete</h4>
+                        <p class="team-card-role">Project Creator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fas fa-globe-americas"></i>
+                        <h3>Exoplanet Explorer</h3>
+                    </div>
+                    <p>Your gateway to discovering worlds beyond our solar system with the latest research and data.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Latest Discoveries</a></li>
+                        <li><a href="#">Research Papers</a></li>
+                        <li><a href="#">Educational Resources</a></li>
+                        <li><a href="#">Exoplanet Database</a></li>
+                        <li><a href="#">Mission Updates</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
