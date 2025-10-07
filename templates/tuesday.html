@@ -308,56 +308,68 @@
         }
 
         .pagination-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 8px 15px;
+            color: var(--text-primary);
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .pagination-btn:hover:not(:disabled) {
             background: var(--accent-primary);
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(122, 103, 255, 0.2);
         }
 
         .pagination-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .page-numbers {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
 
         .page-number {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            color: var(--text-secondary);
+            color: var(--text-primary);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        .page-number:hover {
-            background: rgba(122, 103, 255, 0.2);
-            border-color: var(--accent-primary);
+        .page-number:hover:not(.active) {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            color: white;
         }
 
         .page-number.active {
             background: var(--accent-primary);
             color: white;
             border-color: var(--accent-primary);
+        }
+
+        .page-number.ellipsis {
+            cursor: default;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
         }
 
         .nasa-section, .github-section {
@@ -429,12 +441,13 @@
         .control-btn {
             background: rgba(5, 7, 30, 0.7);
             border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 8px 15px;
+            color: var(--text-primary);
+            padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
+            font-weight: 500;
             backdrop-filter: blur(5px);
         }
 
@@ -688,6 +701,16 @@
             .card-container {
                 height: 400px;
             }
+
+            .pagination-btn, .page-number {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+
+            .page-number {
+                width: 35px;
+                height: 35px;
+            }
         }
     </style>
 </head>
@@ -785,7 +808,11 @@
                         
                         <div class="pagination-container">
                             <div class="pagination-info" id="paginationInfo">
-                                Showing 1 to {{ [10, data|length]|min }} of {{ data|length }} records
+                                {% if stats.total_rows > 0 %}
+                                Showing 1 to {{ stats.total_rows | min(10) }} of {{ stats.total_rows }} records
+                                {% else %}
+                                No records available
+                                {% endif %}
                             </div>
                             <div class="pagination-controls">
                                 <button class="pagination-btn" id="prevPage" disabled>
@@ -955,14 +982,22 @@
         // Pagination variables
         const recordsPerPage = 10;
         let currentPage = 1;
-        let totalPages = Math.ceil({{ data|length }} / recordsPerPage);
+        let totalPages = Math.ceil({{ stats.total_rows || 0 }} / recordsPerPage);
         let allData = {{ data|tojson }};
         let filteredData = allData;
 
         // Initialize pagination
         function initializePagination() {
+            if (filteredData.length === 0) {
+                document.getElementById('paginationInfo').textContent = 'No records available';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
+                document.getElementById('pageNumbers').innerHTML = '';
+                return;
+            }
             updatePaginationControls();
             renderPageNumbers();
+            renderTable();
         }
 
         // Update pagination controls
@@ -971,6 +1006,13 @@
             const endIndex = Math.min(startIndex + recordsPerPage, filteredData.length);
             const totalRecords = filteredData.length;
             
+            if (totalRecords === 0) {
+                document.getElementById('paginationInfo').textContent = 'No records available';
+                document.getElementById('prevPage').disabled = true;
+                document.getElementById('nextPage').disabled = true;
+                return;
+            }
+
             document.getElementById('paginationInfo').textContent = 
                 `Showing ${startIndex + 1} to ${endIndex} of ${totalRecords} records`;
             
@@ -985,15 +1027,18 @@
             
             if (totalPages <= 1) return;
 
+            // Always show first page
             addPageNumber(1);
             
-            if (currentPage > 3) {
+            // Show ellipsis if needed before middle pages
+            if (currentPage > 3 && totalPages > 5) {
                 const ellipsis = document.createElement('span');
-                ellipsis.className = 'page-number';
+                ellipsis.className = 'page-number ellipsis';
                 ellipsis.textContent = '...';
                 pageNumbersContainer.appendChild(ellipsis);
             }
             
+            // Show middle pages (current page ± 1)
             const startPage = Math.max(2, currentPage - 1);
             const endPage = Math.min(totalPages - 1, currentPage + 1);
             
@@ -1001,14 +1046,18 @@
                 addPageNumber(i);
             }
             
-            if (currentPage < totalPages - 2) {
+            // Show ellipsis if needed after middle pages
+            if (currentPage < totalPages - 2 && totalPages > 5) {
                 const ellipsis = document.createElement('span');
-                ellipsis.className = 'page-number';
+                ellipsis.className = 'page-number ellipsis';
                 ellipsis.textContent = '...';
                 pageNumbersContainer.appendChild(ellipsis);
             }
             
-            addPageNumber(totalPages);
+            // Always show last page if there are more than 1 page
+            if (totalPages > 1) {
+                addPageNumber(totalPages);
+            }
         }
 
         function addPageNumber(pageNumber) {
@@ -1097,7 +1146,7 @@
                 });
             }
             
-            totalPages = Math.ceil(filteredData.length / recordsPerPage);
+            totalPages = Math.ceil(filteredData.length / recordsPerPage) || 1;
             currentPage = 1;
             
             renderTable();
@@ -1107,6 +1156,12 @@
             
             loadingIndicator.style.display = 'none';
             tableContent.style.display = 'block';
+
+            // Trigger click on first row if available
+            const firstRow = document.querySelector('#tableBody tr');
+            if (firstRow) {
+                firstRow.click();
+            }
         }
 
         function updateSearchInfo(totalResults, query) {
@@ -1231,18 +1286,9 @@
             // Initial data load is handled by server-side rendering
             allData = {{ data|tojson }};
             filteredData = allData;
-            totalPages = Math.ceil(filteredData.length / recordsPerPage);
+            totalPages = Math.ceil(filteredData.length / recordsPerPage) || 1;
             
-            // Initialize pagination and render the first page
             initializePagination();
-            renderTable();
-            addRowClickListeners();
-
-            // Select the first row by default
-            const firstRow = document.querySelector('#tableBody tr');
-            if (firstRow) {
-                firstRow.click();
-            }
         });
     </script>
 </body>
