@@ -264,6 +264,12 @@
             transition: all 0.2s ease;
         }
 
+        .data-table td.confirmed {
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: var(--success-color) !important;
+            font-weight: 500;
+        }
+
         .data-table tr:hover td {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
@@ -1140,9 +1146,12 @@ function updateStats() {
                 const rowNasa = row['nasa_url'] || row['nasa'] || '';
                 bodyHtml += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}">`;
                 columns.forEach(column => {
-                    bodyHtml += `<td data-column="${column}">${row[column] || ''}</td>`;
+                    const cellValue = row[column] || '';
+                    const isConfirmed = cellValue === 'CONFIRMED';
+                    const cellClass = isConfirmed ? 'confirmed' : '';
+                    bodyHtml += `<td data-column="${column}" class="${cellClass}">${cellValue}</td>`;
                 });
-                bodyHtml += `</tr>`;
+                bodyHtml += `</tr>`;;
             });
             
             tableBody.innerHTML = bodyHtml;
