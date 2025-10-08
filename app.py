@@ -16,7 +16,7 @@ def about():
     return render_template("about.html")
     
 @app.route("/tuesday")
-def about():
+def tuesday():
     return render_template("tuesday.html")
 
 
