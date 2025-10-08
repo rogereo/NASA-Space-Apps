@@ -14,6 +14,11 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html")
+    
+@app.route("/tuesday")
+def about():
+    return render_template("tuesday.html")
+
 
 @app.route("/dashboard")
 def dashboard():
