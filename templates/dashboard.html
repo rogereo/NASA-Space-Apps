@@ -664,6 +664,67 @@
             font-size: 0.9rem;
         }
 
+        .visualization-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .educational-summary {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            height: 500px;
+            overflow-y: auto;
+        }
+
+        .educational-summary h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .educational-summary h3 i {
+            color: var(--accent-primary);
+        }
+
+        .educational-summary-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .summary-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .summary-placeholder i {
+            font-size: 3rem;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+        }
+
+        .summary-placeholder h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .summary-placeholder p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
         @media (max-width: 768px) {
             .header-content, .pagination-container, .section-header {
                 flex-direction: column;
@@ -674,7 +735,7 @@
                 font-size: 2.2rem;
             }
             
-            .stats-container, .github-content, .footer-content {
+            .stats-container, .github-content, .footer-content, .visualization-section {
                 grid-template-columns: 1fr;
             }
             
@@ -733,36 +794,30 @@
                     <div class="stat-label">Total Records</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="totalColumns">0</div>
+                    <div class="stat-number" id="totalColumns">8</div>
                     <div class="stat-label">Data Columns</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="featuresTracked">0</div>
+                    <div class="stat-number" id="featuresTracked">8</div>
                     <div class="stat-label">Features Tracked</div>
                 </div>
             </div>
 
             <section class="data-section">
                 <div class="table-container">
-                    <div id="loadingIndicator" class="loading">
+                    <div id="loadingIndicator" class="loading" style="display: none;">
                         <i class="fas fa-spinner fa-spin"></i>
                         <p>Loading exoplanet data...</p>
                     </div>
 
-                    <div id="tableContent" style="display: none;">
+                    <div id="tableContent" style="display: block;">
                         <table class="data-table">
-                            <thead id="tableHeader">
-                                <!-- Table headers will be populated by JavaScript -->
-                            </thead>
-                            <tbody id="tableBody">
-                                <!-- Table rows will be populated by JavaScript -->
-                            </tbody>
+                            <thead id="tableHeader"></thead>
+                            <tbody id="tableBody"></tbody>
                         </table>
                         
                         <div class="pagination-container">
-                            <div class="pagination-info" id="paginationInfo">
-                                Showing 0 records
-                            </div>
+                            <div class="pagination-info" id="paginationInfo">Showing 0 to 0 of 0 records</div>
                             <div class="pagination-controls">
                                 <button class="pagination-btn" id="prevPage" disabled>
                                     <i class="fas fa-chevron-left"></i> Previous
@@ -783,33 +838,22 @@
                         <i class="fas fa-satellite"></i>
                         NASA Exoplanet Exploration
                     </div>
-                    <div class="selected-planet" id="selectedPlanet">
-                        Select a planet to view details
-                    </div>
+                    <div class="selected-planet" id="selectedPlanet">No Planet Selected</div>
                 </div>
                 <div class="card-container">
-                    <div id="iframePlaceholder" class="iframe-placeholder">
+                    <div id="iframePlaceholder" class="iframe-placeholder" style="display: flex;">
                         <i class="fas fa-globe-americas"></i>
-                        <h3>No Planet Selected</h3>
-                        <p>Click on a row in the table above to view NASA exoplanet data</p>
+                        <h3>No NASA Data Available</h3>
+                        <p>Select a planet from the table above.</p>
                     </div>
-                    <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" 
-                            src=""
-                            allowfullscreen>
-                    </iframe>
+                    <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" src="" allowfullscreen></iframe>
                 </div>
             </section>
 
-            <section class="nasa-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="fas fa-film"></i>
-                        Light Curve GIF Visualization
-                    </div>
-                </div>
+            <section class="visualization-section">
                 <div class="visualization-container">
                     <div id="gifContent" class="gif-content">
-                        <div id="gifPlaceholder" class="iframe-placeholder">
+                        <div id="gifPlaceholder" class="iframe-placeholder" style="display: flex;">
                             <i class="fas fa-image"></i>
                             <h3>No GIF Selected</h3>
                             <p>Click on a row in the table to see its light curve visualization.</p>
@@ -820,6 +864,16 @@
                             <button id="pauseButton" class="control-btn"><i class="fas fa-pause"></i> Pause</button>
                         </div>
                     </div>
+                </div>
+                
+                <div class="educational-summary">
+                    <h3><i class="fas fa-book"></i> Educational Summary</h3>
+                    <div id="summaryPlaceholder" class="summary-placeholder" style="display: flex;">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>No Summary Available</h3>
+                        <p>Select a planet from the table above.</p>
+                    </div>
+                    <div id="educationalSummary" class="educational-summary-content" style="display: none;"></div>
                 </div>
             </section>
 
@@ -909,114 +963,135 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
+                <p>© <span id="current-year">2025</span> Exoplanet Explorer. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
         // Data variables
-let allData = [];
-let filteredData = [];
-let columns = [];
+        let allData = [];
+        let filteredData = [];
+        let columns = [];
 
-// Pagination variables
-const recordsPerPage = 10;
-let currentPage = 1;
-let totalPages = 1;
+        // Pagination variables
+        const recordsPerPage = 10;
+        let currentPage = 1;
+        let totalPages = 1;
 
-// Update copyright year automatically
-document.getElementById('current-year').textContent = new Date().getFullYear();
+        // Update copyright year automatically
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
-// Initialize the dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    loadData();
-    initializeEventListeners();
-});
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            initializeEventListeners();
+        });
 
-// Load data from CSV
-async function loadData() {
-    try {
-        const response = await fetch('https://detwet.com/data.csv');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Load data from CSV
+        async function loadData() {
+            try {
+                const response = await fetch('https://detwet.com/data.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                parseCSVData(csvText);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError(`Failed to load data: ${error.message}`);
+            }
         }
-        
-        const csvText = await response.text();
-        parseCSVData(csvText);
-    } catch (error) {
-        console.error('Error loading data:', error);
-        showError(`Failed to load data: ${error.message}`);
-    }
-}
 
-// Parse CSV data
-function parseCSVData(csvText) {
-    try {
-        const lines = csvText.split('\n').filter(line => line.trim() !== '');
-        if (lines.length === 0) {
-            throw new Error('CSV file is empty');
-        }
-        
-        // Extract all column headers from CSV
-        const allColumns = lines[0].split(',').map(col => col.trim());
-        
-        // Select only the first 8 columns
-        columns = allColumns.slice(0, 8);
-        
-        // If fewer than 8 columns are available, log a warning
-        if (columns.length < 8) {
-            console.warn(`CSV contains only ${columns.length} columns, expected 8. Available columns: ${columns.join(', ')}`);
-        }
-        
-        // Get indices of selected columns for data parsing
-        const columnIndices = columns.map(col => allColumns.indexOf(col));
-        
-        // Parse data rows
-        allData = [];
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',');
-            const row = {};
-            
-            columns.forEach((col, index) => {
-                const colIndex = columnIndices[index];
-                row[col] = values[colIndex] ? values[colIndex].trim() : '';
-            });
-            
-            // Include GIF and NASA URL if they exist in the CSV
-            const gifIndex = allColumns.indexOf('gif') !== -1 ? allColumns.indexOf('gif') : allColumns.indexOf('gif_url');
-            const nasaIndex = allColumns.indexOf('nasa_url') !== -1 ? allColumns.indexOf('nasa_url') : allColumns.indexOf('nasa');
-            if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex].trim() : '';
-            if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex].trim() : '';
-            
-            allData.push(row);
-        }
-        
-        // Update stats and render table
-        updateStats();
-        filteredData = allData;
-        totalPages = Math.ceil(filteredData.length / recordsPerPage);
-        renderTable();
-        updatePaginationControls();
-        renderPageNumbers();
-        
-        // Hide loading indicator and show table
-        document.getElementById('loadingIndicator').style.display = 'none';
-        document.getElementById('tableContent').style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error parsing CSV:', error);
-        showError(`Failed to parse data: ${error.message}`);
-    }
-}
+        // Parse CSV data
+        function parseCSVData(csvText) {
+            try {
+                const lines = csvText.split('\n').filter(line => line.trim() !== '');
+                if (lines.length === 0) {
+                    throw new Error('CSV file is empty');
+                }
 
-// Update statistics
-function updateStats() {
-    document.getElementById('totalRecords').textContent = allData.length;
-    document.getElementById('totalColumns').textContent = columns.length;
-    document.getElementById('featuresTracked').textContent = 8; // Fixed to 8 as per requirement
-}
+                // Function to parse a CSV line, handling quoted fields
+                function parseCSVLine(line) {
+                    const result = [];
+                    let current = '';
+                    let inQuotes = false;
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            result.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    result.push(current.trim());
+                    return result;
+                }
 
+                // Extract all column headers from CSV
+                const allColumns = parseCSVLine(lines[0]).map(col => col.replace(/^"|"$/g, '')); // Remove quotes from headers
+                
+                // Select only the first 8 columns
+                columns = allColumns.slice(0, 8);
+                
+                // If fewer than 8 columns are available, log a warning
+                if (columns.length < 8) {
+                    console.warn(`CSV contains only ${columns.length} columns, expected 8. Available columns: ${columns.join(', ')}`);
+                }
+                
+                // Get indices of selected columns for data parsing
+                const columnIndices = columns.map(col => allColumns.indexOf(col));
+                const gifIndex = allColumns.indexOf('gif');
+                const nasaIndex = allColumns.indexOf('nasa_url');
+                const summaryIndex = allColumns.indexOf('educational_summary');
+                
+                // Parse data rows
+                allData = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]).map(val => val.replace(/^"|"$/g, '')); // Remove quotes from values
+                    const row = {};
+                    
+                    columns.forEach((col, index) => {
+                        const colIndex = columnIndices[index];
+                        row[col] = values[colIndex] ? values[colIndex] : '';
+                    });
+                    
+                    // Include GIF, NASA URL, and educational summary
+                    if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex] : '';
+                    if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex] : '';
+                    if (summaryIndex !== -1) row['educational_summary'] = values[summaryIndex] ? values[summaryIndex] : '';
+                    
+                    allData.push(row);
+                }
+                
+                // Update stats and render table
+                updateStats();
+                filteredData = allData;
+                totalPages = Math.ceil(filteredData.length / recordsPerPage);
+                renderTable();
+                updatePaginationControls();
+                renderPageNumbers();
+                
+                // Hide loading indicator and show table
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('tableContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error parsing CSV:', error);
+                showError(`Failed to parse data: ${error.message}`);
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = allData.length;
+            document.getElementById('totalColumns').textContent = columns.length;
+            document.getElementById('featuresTracked').textContent = 8; // Fixed to 8 as per requirement
+        }
 
         // Initialize event listeners
         function initializeEventListeners() {
@@ -1068,8 +1143,7 @@ function updateStats() {
             });
 
             document.getElementById('pauseButton').addEventListener('click', () => {
-                // This is a trick: to "pause" a GIF, we can replace it with a canvas showing the current frame.
-                // For simplicity here, we'll just clear it. A true pause is complex.
+                // Clear the GIF to simulate pause (true pause requires canvas)
                 document.getElementById('gifImg').src = ''; 
             });
         }
@@ -1142,16 +1216,19 @@ function updateStats() {
             
             let bodyHtml = '';
             pageData.forEach((row, index) => {
-                const rowGif = row['gif'] || row['gif_url'] || '';
-                const rowNasa = row['nasa_url'] || row['nasa'] || '';
-                bodyHtml += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}">`;
+                const rowGif = row['gif'] || '';
+                const rowNasa = row['nasa_url'] || '';
+                const rowSummary = row['educational_summary'] || '';
+                // Escape special characters for HTML attribute
+                const escapedSummary = rowSummary.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+                bodyHtml += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}" data-summary="${escapedSummary}">`;
                 columns.forEach(column => {
                     const cellValue = row[column] || '';
                     const isConfirmed = cellValue === 'CONFIRMED';
                     const cellClass = isConfirmed ? 'confirmed' : '';
                     bodyHtml += `<td data-column="${column}" class="${cellClass}">${cellValue}</td>`;
                 });
-                bodyHtml += `</tr>`;;
+                bodyHtml += `</tr>`;
             });
             
             tableBody.innerHTML = bodyHtml;
@@ -1167,6 +1244,7 @@ function updateStats() {
                     this.classList.add('selected');
                     updateNasaIframe(this);
                     updateGifVisualization(this);
+                    updateEducationalSummary(this);
                 });
             });
             
@@ -1186,7 +1264,7 @@ function updateStats() {
             
             selectedRow.querySelectorAll('td').forEach(cell => {
                 const column = cell.getAttribute('data-column');
-                if (column && ['kepler_name', 'Planet', 'planet', 'Name', 'name'].includes(column)) {
+                if (column === 'kepler_name') {
                     planetName = cell.textContent.trim();
                 }
             });
@@ -1245,6 +1323,38 @@ function updateStats() {
                 gifImg.style.display = 'none';
                 gifPlaceholder.style.display = 'flex';
                 gifControls.style.display = 'none';
+            }
+        }
+
+        // Update educational summary based on selected row
+        function updateEducationalSummary(selectedRow) {
+            const summaryText = selectedRow.getAttribute('data-summary');
+            const educationalSummary = document.getElementById('educationalSummary');
+            const summaryPlaceholder = document.getElementById('summaryPlaceholder');
+            let planetName = '';
+            
+            selectedRow.querySelectorAll('td').forEach(cell => {
+                const column = cell.getAttribute('data-column');
+                if (column === 'kepler_name') {
+                    planetName = cell.textContent.trim();
+                }
+            });
+
+            if (summaryText && summaryText.trim() !== '') {
+                educationalSummary.innerHTML = `
+                    <h4>About ${planetName || 'this exoplanet'}</h4>
+                    <p>${summaryText}</p>
+                `;
+                educationalSummary.style.display = 'block';
+                summaryPlaceholder.style.display = 'none';
+            } else {
+                educationalSummary.style.display = 'none';
+                summaryPlaceholder.style.display = 'flex';
+                summaryPlaceholder.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <h3>No Summary Available</h3>
+                    <p>No educational summary available for ${planetName || 'this exoplanet'}.</p>
+                `;
             }
         }
 
