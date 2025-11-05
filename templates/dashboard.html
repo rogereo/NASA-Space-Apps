@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exoplanet Explorer - Data Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -392,11 +393,48 @@
             padding: 20px;
             border: 1px solid var(--border-color);
             position: relative;
-            min-height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 480px;
+            display: block;
         }
+
+        /* Revised split: smaller left (model), larger right (3D) */
+        .visualization-section.viz-split { display: grid; grid-template-columns: 1fr 2.1fr; gap: 24px; }
+        .viz-left, .viz-right { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; }
+        .viz-left { min-height: 520px; }
+        .viz-right { min-height: clamp(520px, 58vh, 820px); }
+        .chart-wrap { position: relative; width: 100%; height: clamp(360px, 42vh, 560px); }
+        .embed-iframe { width: 100%; height: clamp(520px, 60vh, 840px); border: none; border-radius: 12px; display: block; }
+        .viz-right { overflow: visible; }
+        .viz-title { margin: 4px 0 12px; font-size: 1.2rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+
+        /* Model performance additions */
+        .perf-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .perf-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .perf-label { color: var(--text-secondary); font-size: 0.85rem; }
+        .perf-value { color: var(--text-primary); font-weight: 600; font-size: 1.05rem; }
+
+        .model-table-wrap { margin-top: 16px; }
+        .model-table { width: 100%; border-collapse: collapse; }
+        .model-table th, .model-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+            color: var(--text-secondary);
+        }
+        .model-table th { color: var(--text-primary); font-weight: 600; }
+        .model-table tr:hover td { background: rgba(255,255,255,0.03); color: var(--text-primary); }
 
         .gif-content {
             position: relative;
@@ -664,6 +702,7 @@
             font-size: 0.9rem;
         }
 
+        /* New styles for the educational summary section */
         .visualization-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -735,7 +774,7 @@
                 font-size: 2.2rem;
             }
             
-            .stats-container, .github-content, .footer-content, .visualization-section {
+            .stats-container, .github-content, .footer-content, .visualization-section, .viz-split {
                 grid-template-columns: 1fr;
             }
             
@@ -770,6 +809,13 @@
                 <h2>Exoplanet Data Dashboard</h2>
                 <p>Explore and analyze exoplanet data from our comprehensive database</p>
                 
+                <!-- ✅ Dataset selector inserted here -->
+                <select id="datasetSelector" class="search-box" style="max-width:250px;margin-top:20px;">
+                    <option value="koi" {% if source == 'koi' %}selected{% endif %}>KOI</option>
+                    <option value="tess" {% if source == 'tess' %}selected{% endif %}>TESS</option>
+                    <option value="combo" {% if source == 'combo' %}selected{% endif %}>KOI &amp; TESS</option>
+                </select>
+
                 <div class="search-container">
                     <input type="text" id="searchInput" class="search-box" placeholder="Search for planets, stars, discovery methods...">
                     <div class="search-icon">
@@ -788,36 +834,72 @@
 
             <div id="searchResultsInfo" class="search-results-info" style="display: none;"></div>
 
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalRecords">0</div>
-                    <div class="stat-label">Total Records</div>
+            <!-- KPI cards removed per request -->
+
+            
+            <div class="top-dashboard">
+            <div class="visualization-section viz-split" style="margin-top:40px;">
+                <!-- Model Performance -->
+                <div class="visualization-container viz-left">
+                  <h3 class="viz-title"><i class="fas fa-chart-line"></i> Model Performance</h3>
+                  <div class="perf-stats">
+                      <div class="perf-card">
+                          <div class="perf-label">Total Records</div>
+                          <div class="perf-value" id="perfTotal">-</div>
+                      </div>
+                      <div class="perf-card"><div class="perf-label">Training</div><div class="perf-value" id="perfTrain">-</div></div>
+                      <div class="perf-card"><div class="perf-label">Validation</div><div class="perf-value" id="perfVal">-</div></div>
+                      <div class="perf-card"><div class="perf-label">Testing</div><div class="perf-value" id="perfTest">-</div></div>
+                  </div>
+                  <div class="chart-wrap">
+                      <canvas id="modelPerformanceChart" style="position:absolute;inset:0;"></canvas>
+                  </div>
+                  <div class="model-table-wrap">
+                      <table class="model-table">
+                          <thead>
+                              <tr>
+                                  <th>Model</th>
+                                  <th>Validation</th>
+                                  <th>Testing</th>
+                              </tr>
+                          </thead>
+                          <tbody id="modelRows">
+                              <!-- filled by JS -->
+                          </tbody>
+                      </table>
+                  </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalColumns">8</div>
-                    <div class="stat-label">Data Columns</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="featuresTracked">8</div>
-                    <div class="stat-label">Features Tracked</div>
+
+                <!-- 3D Embedding Visualization -->
+                <div class="visualization-container viz-right">
+                  <h3 class="viz-title"><i class="fas fa-cube"></i> 3D Embedding Visualization</h3>
+                  <iframe id="embeddingViewer" src="about:blank" class="embed-iframe"></iframe>
                 </div>
             </div>
+            </div>
+
 
             <section class="data-section">
                 <div class="table-container">
-                    <div id="loadingIndicator" class="loading" style="display: none;">
+                    <div id="loadingIndicator" class="loading">
                         <i class="fas fa-spinner fa-spin"></i>
                         <p>Loading exoplanet data...</p>
                     </div>
 
-                    <div id="tableContent" style="display: block;">
+                    <div id="tableContent" style="display: none;">
                         <table class="data-table">
-                            <thead id="tableHeader"></thead>
-                            <tbody id="tableBody"></tbody>
+                            <thead id="tableHeader">
+                                <!-- Table headers will be populated by JavaScript -->
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
                         </table>
                         
                         <div class="pagination-container">
-                            <div class="pagination-info" id="paginationInfo">Showing 0 to 0 of 0 records</div>
+                            <div class="pagination-info" id="paginationInfo">
+                                Showing 0 records
+                            </div>
                             <div class="pagination-controls">
                                 <button class="pagination-btn" id="prevPage" disabled>
                                     <i class="fas fa-chevron-left"></i> Previous
@@ -838,22 +920,28 @@
                         <i class="fas fa-satellite"></i>
                         NASA Exoplanet Exploration
                     </div>
-                    <div class="selected-planet" id="selectedPlanet">No Planet Selected</div>
+                    <div class="selected-planet" id="selectedPlanet">
+                        Select a planet to view details
+                    </div>
                 </div>
                 <div class="card-container">
-                    <div id="iframePlaceholder" class="iframe-placeholder" style="display: flex;">
+                    <div id="iframePlaceholder" class="iframe-placeholder">
                         <i class="fas fa-globe-americas"></i>
-                        <h3>No NASA Data Available</h3>
-                        <p>Select a planet from the table above.</p>
+                        <h3>No Planet Selected</h3>
+                        <p>Click on a row in the table above to view NASA exoplanet data</p>
                     </div>
-                    <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" src="" allowfullscreen></iframe>
+                    <iframe id="nasaIframe" class="nasa-iframe" style="display: none;" 
+                            src=""
+                            allowfullscreen>
+                    </iframe>
                 </div>
             </section>
 
+            <!-- Updated section with educational summary -->
             <section class="visualization-section">
                 <div class="visualization-container">
                     <div id="gifContent" class="gif-content">
-                        <div id="gifPlaceholder" class="iframe-placeholder" style="display: flex;">
+                        <div id="gifPlaceholder" class="iframe-placeholder">
                             <i class="fas fa-image"></i>
                             <h3>No GIF Selected</h3>
                             <p>Click on a row in the table to see its light curve visualization.</p>
@@ -868,12 +956,14 @@
                 
                 <div class="educational-summary">
                     <h3><i class="fas fa-book"></i> Educational Summary</h3>
-                    <div id="summaryPlaceholder" class="summary-placeholder" style="display: flex;">
+                    <div id="summaryPlaceholder" class="summary-placeholder">
                         <i class="fas fa-info-circle"></i>
-                        <h3>No Summary Available</h3>
-                        <p>Select a planet from the table above.</p>
+                        <h3>No Planet Selected</h3>
+                        <p>Click on a row in the table to view educational information about the selected exoplanet.</p>
                     </div>
-                    <div id="educationalSummary" class="educational-summary-content" style="display: none;"></div>
+                    <div id="educationalSummary" class="educational-summary-content" style="display: none;">
+                        <!-- Educational summary content will be populated by JavaScript -->
+                    </div>
                 </div>
             </section>
 
@@ -963,7 +1053,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© <span id="current-year">2025</span> Exoplanet Explorer. All rights reserved.</p>
+                <p>© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -982,88 +1072,73 @@
         // Update copyright year automatically
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        // Initialize the dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initializeEventListeners();
-        });
+        // We initialize later in the dataset-aware block below
 
-        // Load data from CSV
-        async function loadData() {
-            try {
-                const response = await fetch('https://detwet.com/data.csv');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                parseCSVData(csvText);
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showError(`Failed to load data: ${error.message}`);
+        // Preferred columns per dataset (case-insensitive)
+        const PREFERRED_COLUMNS_BY_SOURCE = {
+            koi: ['Source','KeplerName','RandomForest','GradientBoosting','AdaBoost','XGBoost','LightGBM','Actual'],
+            tess: ['Source','TessName','RandomForest','GradientBoosting','AdaBoost','XGBoost','LightGBM','Actual'],
+            combo: ['Source','Name','KeplerName','TessName','RandomForest','GradientBoosting','AdaBoost','XGBoost','LightGBM','Actual']
+        };
+
+        // Build visible column list from available headers (exclude Kepid/KepoiName)
+        function selectVisibleColumns(allColumns, sourceKey) {
+            const lowerToActual = {};
+            allColumns.forEach(c => { lowerToActual[c.toLowerCase()] = c; });
+            const selected = [];
+            const pref = PREFERRED_COLUMNS_BY_SOURCE[sourceKey] || PREFERRED_COLUMNS_BY_SOURCE.koi;
+            pref.forEach(name => {
+                const hit = lowerToActual[name.toLowerCase()];
+                if (hit) selected.push(hit);
+            });
+            // Fallback: ensure at least one name-like column if KeplerName missing
+            if (selected.length === 0) {
+                return allColumns.filter(c => !['kepid','kepoiname'].includes(c.toLowerCase())).slice(0, 8);
             }
+            return selected;
         }
 
         // Parse CSV data
-        function parseCSVData(csvText) {
+        function parseCSVData(csvText, sourceKey) {
             try {
-                const lines = csvText.split('\n').filter(line => line.trim() !== '');
+                const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
                 if (lines.length === 0) {
                     throw new Error('CSV file is empty');
                 }
-
-                // Function to parse a CSV line, handling quoted fields
-                function parseCSVLine(line) {
-                    const result = [];
-                    let current = '';
-                    let inQuotes = false;
-                    for (let i = 0; i < line.length; i++) {
-                        const char = line[i];
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            result.push(current.trim());
-                            current = '';
-                        } else {
-                            current += char;
-                        }
-                    }
-                    result.push(current.trim());
-                    return result;
-                }
-
-                // Extract all column headers from CSV
-                const allColumns = parseCSVLine(lines[0]).map(col => col.replace(/^"|"$/g, '')); // Remove quotes from headers
                 
-                // Select only the first 8 columns
-                columns = allColumns.slice(0, 8);
+                // Extract all column headers from CSV (handle quoted commas)
+                const allColumns = parseCsvLine(lines[0]).map(col => col.trim());
+                
+                // Select visible columns, explicitly excluding Kepid and KepoiName
+                columns = selectVisibleColumns(allColumns, sourceKey);
                 
                 // If fewer than 8 columns are available, log a warning
-                if (columns.length < 8) {
-                    console.warn(`CSV contains only ${columns.length} columns, expected 8. Available columns: ${columns.join(', ')}`);
+                if (columns.length < 4) {
+                    console.warn(`CSV contains only ${columns.length} preferred columns. Available: ${columns.join(', ')}`);
                 }
                 
                 // Get indices of selected columns for data parsing
                 const columnIndices = columns.map(col => allColumns.indexOf(col));
-                const gifIndex = allColumns.indexOf('gif');
-                const nasaIndex = allColumns.indexOf('nasa_url');
-                const summaryIndex = allColumns.indexOf('educational_summary');
                 
                 // Parse data rows
                 allData = [];
                 for (let i = 1; i < lines.length; i++) {
-                    const values = parseCSVLine(lines[i]).map(val => val.replace(/^"|"$/g, '')); // Remove quotes from values
+                    const values = parseCsvLine(lines[i]);
                     const row = {};
                     
                     columns.forEach((col, index) => {
                         const colIndex = columnIndices[index];
-                        row[col] = values[colIndex] ? values[colIndex] : '';
+                        row[col] = values[colIndex] ? values[colIndex].trim() : '';
                     });
                     
-                    // Include GIF, NASA URL, and educational summary
-                    if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex] : '';
-                    if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex] : '';
-                    if (summaryIndex !== -1) row['educational_summary'] = values[summaryIndex] ? values[summaryIndex] : '';
+                    // Include GIF and NASA URL if they exist in the CSV
+                    const gifIndex = allColumns.indexOf('gif') !== -1 ? allColumns.indexOf('gif') : allColumns.indexOf('gif_url');
+                    const nasaIndex = allColumns.indexOf('nasa_url') !== -1 ? allColumns.indexOf('nasa_url') : allColumns.indexOf('nasa');
+                    const summaryIndex = allColumns.indexOf('educational_summary') !== -1 ? allColumns.indexOf('educational_summary') : allColumns.indexOf('summary');
+                    
+                    if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex].trim() : '';
+                    if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex].trim() : '';
+                    if (summaryIndex !== -1) row['educational_summary'] = values[summaryIndex] ? values[summaryIndex].trim() : '';
                     
                     allData.push(row);
                 }
@@ -1086,11 +1161,43 @@
             }
         }
 
+        // Robust CSV line parser (handles quotes and commas)
+        function parseCsvLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') { // escaped quote
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current);
+            return result;
+        }
+
         // Update statistics
         function updateStats() {
-            document.getElementById('totalRecords').textContent = allData.length;
-            document.getElementById('totalColumns').textContent = columns.length;
-            document.getElementById('featuresTracked').textContent = 8; // Fixed to 8 as per requirement
+            // KPI cards were removed; guard for older IDs to avoid runtime errors
+            const ids = ['totalRecords','totalColumns','featuresTracked'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === 'totalRecords') el.textContent = allData.length;
+                    if (id === 'totalColumns') el.textContent = columns.length;
+                    if (id === 'featuresTracked') el.textContent = 8;
+                }
+            });
         }
 
         // Initialize event listeners
@@ -1143,7 +1250,8 @@
             });
 
             document.getElementById('pauseButton').addEventListener('click', () => {
-                // Clear the GIF to simulate pause (true pause requires canvas)
+                // This is a trick: to "pause" a GIF, we can replace it with a canvas showing the current frame.
+                // For simplicity here, we'll just clear it. A true pause is complex.
                 document.getElementById('gifImg').src = ''; 
             });
         }
@@ -1182,7 +1290,8 @@
             } else {
                 document.getElementById('searchResultsInfo').style.display = 'none';
             }
-            document.getElementById('totalRecords').textContent = totalResults;
+            const tr = document.getElementById('totalRecords');
+            if (tr) tr.textContent = totalResults;
         }
 
         // Render table for current page
@@ -1216,19 +1325,17 @@
             
             let bodyHtml = '';
             pageData.forEach((row, index) => {
-                const rowGif = row['gif'] || '';
-                const rowNasa = row['nasa_url'] || '';
+                const rowGif = row['gif'] || row['gif_url'] || '';
+                const rowNasa = row['nasa_url'] || row['nasa'] || '';
                 const rowSummary = row['educational_summary'] || '';
-                // Escape special characters for HTML attribute
-                const escapedSummary = rowSummary.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-                bodyHtml += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}" data-summary="${escapedSummary}">`;
+                bodyHtml += `<tr data-gif="${rowGif}" data-nasa="${rowNasa}" data-summary="${rowSummary}">`;
                 columns.forEach(column => {
                     const cellValue = row[column] || '';
                     const isConfirmed = cellValue === 'CONFIRMED';
                     const cellClass = isConfirmed ? 'confirmed' : '';
                     bodyHtml += `<td data-column="${column}" class="${cellClass}">${cellValue}</td>`;
                 });
-                bodyHtml += `</tr>`;
+                bodyHtml += `</tr>`;;
             });
             
             tableBody.innerHTML = bodyHtml;
@@ -1264,7 +1371,7 @@
             
             selectedRow.querySelectorAll('td').forEach(cell => {
                 const column = cell.getAttribute('data-column');
-                if (column === 'kepler_name') {
+                if (column && ['kepler_name', 'Planet', 'planet', 'Name', 'name'].includes(column)) {
                     planetName = cell.textContent.trim();
                 }
             });
@@ -1335,15 +1442,22 @@
             
             selectedRow.querySelectorAll('td').forEach(cell => {
                 const column = cell.getAttribute('data-column');
-                if (column === 'kepler_name') {
+                if (column && ['kepler_name', 'Planet', 'planet', 'Name', 'name'].includes(column)) {
                     planetName = cell.textContent.trim();
                 }
             });
 
-            if (summaryText && summaryText.trim() !== '') {
+            if (summaryText) {
                 educationalSummary.innerHTML = `
                     <h4>About ${planetName || 'this exoplanet'}</h4>
                     <p>${summaryText}</p>
+                    <h4>Key Characteristics</h4>
+                    <ul>
+                        <li><strong>Discovery Method:</strong> ${selectedRow.querySelector('td[data-column="discoverymethod"]')?.textContent || 'Unknown'}</li>
+                        <li><strong>Orbital Period:</strong> ${selectedRow.querySelector('td[data-column="pl_orbper"]')?.textContent || 'Unknown'} days</li>
+                        <li><strong>Planet Radius:</strong> ${selectedRow.querySelector('td[data-column="pl_rade"]')?.textContent || 'Unknown'} Earth radii</li>
+                        <li><strong>Host Star:</strong> ${selectedRow.querySelector('td[data-column="hostname"]')?.textContent || 'Unknown'}</li>
+                    </ul>
                 `;
                 educationalSummary.style.display = 'block';
                 summaryPlaceholder.style.display = 'none';
@@ -1429,6 +1543,210 @@
             document.getElementById('errorText').textContent = message;
             document.getElementById('errorMessage').style.display = 'block';
         }
+        
+        // Dataset selector change handled below to avoid full reload
+
+        // Model performance visualization (updates with dataset selection)
+        const MODEL_PERFORMANCE = {
+            // All values are AUC (0..1). Only AUC is used for now.
+            koi: {
+                totals: { total: 4619, train: 3233, val: 693, test: 693 },
+                models: [
+                    { name: 'GradientBoosting', val: 0.791, test: 0.759 },
+                    { name: 'RandomForest',     val: 0.774, test: 0.756 },
+                    { name: 'AdaBoost',         val: 0.771, test: 0.728 },
+                    { name: 'XGBoost',          val: 0.753, test: 0.737 },
+                    { name: 'LightGBM (Ensemble)', val: null, test: 0.712 },
+                ],
+            },
+            tess: {
+                totals: { total: 4669, train: 3268, val: 700, test: 701 },
+                models: [
+                    { name: 'GradientBoosting', val: 0.622, test: 0.612 },
+                    { name: 'RandomForest',     val: 0.668, test: 0.623 },
+                    { name: 'AdaBoost',         val: 0.604, test: 0.621 },
+                    { name: 'XGBoost',          val: 0.622, test: 0.592 },
+                    { name: 'LightGBM (Ensemble)', val: null, test: 0.613 },
+                ],
+            },
+            combo: {
+                totals: { total: 9308, train: 6515, val: 1396, test: 1397 },
+                models: [
+                    { name: 'GradientBoosting', val: 0.826, test: 0.827 },
+                    { name: 'RandomForest',     val: 0.838, test: 0.836 },
+                    { name: 'AdaBoost',         val: 0.790, test: 0.792 },
+                    { name: 'XGBoost',          val: 0.833, test: 0.839 },
+                    { name: 'LightGBM (Ensemble)', val: null, test: 0.783 },
+                ],
+            },
+        };
+
+        let perfChart;
+        function initOrUpdatePerfChart(sourceKey) {
+            const cfg = MODEL_PERFORMANCE[sourceKey] || MODEL_PERFORMANCE.koi;
+            const ctx = document.getElementById('modelPerformanceChart').getContext('2d');
+
+            const modelOrder = ['GradientBoosting','RandomForest','AdaBoost','XGBoost','LightGBM (Ensemble)'];
+            const valuesTest = modelOrder.map(name => {
+                const m = cfg.models.find(mm => mm.name === name);
+                return m ? m.test : null;
+            });
+            const data = {
+                labels: modelOrder,
+                datasets: [{
+                    label: 'AUC (Test)',
+                    data: valuesTest,
+                    backgroundColor: 'rgba(122, 103, 255, 0.65)',
+                    borderColor: 'rgba(122, 103, 255, 0.9)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barThickness: 60,
+                    maxBarThickness: 70,
+                }]
+            };
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    },
+                    y: {
+                        min: 0, max: 1, beginAtZero: true,
+                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') } },
+                    tooltip: {
+                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary'),
+                        titleColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                        bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary')
+                    }
+                }
+            };
+
+            if (perfChart) {
+                perfChart.data = data;
+                perfChart.options = options;
+                perfChart.update();
+            } else {
+                perfChart = new Chart(ctx, { type: 'bar', data, options });
+            }
+
+            // Update cards
+            document.getElementById('perfTotal').textContent = cfg.totals.total.toLocaleString();
+            document.getElementById('perfTrain').textContent = cfg.totals.train.toLocaleString();
+            document.getElementById('perfVal').textContent = cfg.totals.val.toLocaleString();
+            document.getElementById('perfTest').textContent = cfg.totals.test.toLocaleString();
+
+            // Update model table
+            const tbody = document.getElementById('modelRows');
+            const fmt = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '-' : `${Math.round(v * 100)}%`;
+            tbody.innerHTML = cfg.models.map(m => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td>${fmt(m.val)}</td>
+                    <td>${fmt(m.test)}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const currentSource = params.get('source') || 'koi';
+            initOrUpdatePerfChart(currentSource);
+        });
+
+        // helper: read current ?source=... to pre-select and update sections
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSource = urlParams.get('source') || 'koi';
+        const selectorEl = document.getElementById('datasetSelector');
+        if (selectorEl) selectorEl.value = currentSource;
+        // keep model chart in sync immediately
+        try { initOrUpdatePerfChart(currentSource); } catch (e) {}
+
+        // map dataset -> hosted 3D viewer page
+        const EMBED_BASE = 'https://rogereo.github.io/assets/embedding/';
+        const VIEWER_BY_SOURCE = {
+            koi:   EMBED_BASE + 'viewer_koi.html',
+            tess:  EMBED_BASE + 'viewer_tess.html',
+            combo: EMBED_BASE + 'viewer_combo.html'
+        };
+
+        // set initial 3D viewer (on page load)
+        const embeddingIframe = document.getElementById('embeddingViewer');
+        if (embeddingIframe) {
+            embeddingIframe.src = VIEWER_BY_SOURCE[currentSource] || VIEWER_BY_SOURCE.koi;
+        }
+
+        // when user switches the dataset, update the 3D viewer (and URL for consistency)
+        document.getElementById('datasetSelector').addEventListener('change', function () {
+            const selected = this.value; // 'koi' | 'tess' | 'combo'
+            // update iframe
+            embeddingIframe.src = VIEWER_BY_SOURCE[selected] || VIEWER_BY_SOURCE.koi;
+
+            // (optional but recommended) reflect selection in the URL to keep state/share links
+            urlParams.set('source', selected);
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+            window.history.replaceState({}, '', newUrl);
+            // also update the model performance view live
+            try { initOrUpdatePerfChart(selected); } catch (e) {}
+        });
+
+        // Load dataset CSVs and update table on selection change
+        document.addEventListener("DOMContentLoaded", () => {
+        const selector = document.getElementById("datasetSelector");
+        const embeddingViewer = document.getElementById("embeddingViewer");
+
+        const EMBED_BASE = "https://rogereo.github.io/assets/embedding/";
+        const VIEWER_BY_SOURCE = {
+            koi:   EMBED_BASE + "viewer_koi.html",
+            tess:  EMBED_BASE + "viewer_tess.html",
+            combo: EMBED_BASE + "viewer_combo.html"
+        };
+
+        // ✅ point to CSVs hosted on your GitHub Pages site
+        const DATA_BY_SOURCE = {
+            koi:   "/api/data/koi",
+            tess:  "/api/data/tess",
+            combo: "/api/data/combo"
+        };
+
+        // init from ?source=
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSource = urlParams.get("source") || "koi";
+        selector.value = currentSource;
+        embeddingViewer.src = VIEWER_BY_SOURCE[currentSource];
+
+        // load initial dataset
+        fetch(DATA_BY_SOURCE[currentSource])
+            .then(r => r.text())
+            .then(text => parseCSVData(text, currentSource))
+            .catch(e => showError(`Failed to load dataset: ${e.message}`));
+
+        // on change
+        selector.addEventListener("change", function () {
+            const selected = this.value;
+            embeddingViewer.src = VIEWER_BY_SOURCE[selected];
+            urlParams.set("source", selected);
+            window.history.replaceState({}, "", `${window.location.pathname}?${urlParams.toString()}`);
+
+            // reload table with new dataset
+            fetch(DATA_BY_SOURCE[selected])
+            .then(r => r.text())
+            .then(text => parseCSVData(text, selected))
+            .catch(e => showError(`Failed to load dataset: ${e.message}`));
+
+            // refresh model performance on dataset switch
+            try { initOrUpdatePerfChart(selected); } catch (e) {}
+        // ensure other UI listeners are bound once DOM is ready
+        initializeEventListeners();
+        });
+        });
+
     </script>
 </body>
 </html>
