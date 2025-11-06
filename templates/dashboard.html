@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -397,15 +397,29 @@
             display: block;
         }
 
-        /* Revised split: smaller left (model), larger right (3D) */
-        .visualization-section.viz-split { display: grid; grid-template-columns: 1fr 2.1fr; gap: 24px; }
+        /* Revised split: emphasize the 3D panel */
+        .visualization-section.viz-split { display: grid; grid-template-columns: 0.9fr 2.3fr; gap: 24px; }
         .viz-left, .viz-right { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; }
         .viz-left { min-height: 520px; }
-        .viz-right { min-height: clamp(520px, 58vh, 820px); }
+        /* Right panel grows based on viewport for better presence */
+        .viz-right { min-height: 560px; height: clamp(560px, 72vh, 900px); }
         .chart-wrap { position: relative; width: 100%; height: clamp(360px, 42vh, 560px); }
-        .embed-iframe { width: 100%; height: clamp(520px, 60vh, 840px); border: none; border-radius: 12px; display: block; }
+        /* Make the embedded 3D viewer fill the container */
+        .embed-iframe {
+            width: 100%;
+            flex: 1 1 auto;   /* grow to fill remaining space */
+            height: auto;     /* let flex govern height */
+            min-height: 0;    /* allow full flexing within parent */
+            border: none;
+            border-radius: 12px;
+            display: block;
+        }
         .viz-right { overflow: visible; }
         .viz-title { margin: 4px 0 12px; font-size: 1.2rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        /* Unified card title style */
+        .card-title { margin: 0 0 12px; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); display:block; letter-spacing: .2px; }
+        /* legacy marker style kept unused on purpose */
+        .card-title .emoji-dot { display:none; }
 
         /* Model performance additions */
         .perf-stats {
@@ -438,24 +452,23 @@
 
         .gif-content {
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 520px;
         }
 
         #gifImg {
+            display: block;
+            margin: 0 auto;
             max-width: 100%;
-            max-height: 500px;
+            max-height: 100%;
             border-radius: 10px;
             object-fit: contain;
             background: #000;
         }
 
-        .gif-controls {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
+        /* gif-controls removed */
 
         .control-btn {
             background: rgba(5, 7, 30, 0.7);
@@ -708,16 +721,35 @@
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin: 60px 0;
+            align-items: stretch;
         }
+
+        /* Stack for left column below: two equal height cards */
+        .left-stack { display: flex; flex-direction: column; gap: 30px; height: auto; }
+        .left-card { flex: 1 1 0; min-height: 0; }
 
         .educational-summary {
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 30px;
             border: 1px solid var(--border-color);
-            height: 500px;
             overflow-y: auto;
         }
+
+        .lightkurve-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px 30px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            overflow: auto;
+        }
+
+        /* Dataset Summary + Feature List (above summary/GIF) */
+        .info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0 10px; }
+        .info-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px 30px; color: var(--text-secondary); }
+        .info-card ul { margin-left: 18px; margin-top: 10px; columns: 2; column-gap: 24px; }
+        .info-card li { break-inside: avoid; padding: 2px 0; }
 
         .educational-summary h3 {
             font-size: 1.5rem;
@@ -809,7 +841,7 @@
                 <h2>Exoplanet Data Dashboard</h2>
                 <p>Explore and analyze exoplanet data from our comprehensive database</p>
                 
-                <!-- ✅ Dataset selector inserted here -->
+                <!-- âœ… Dataset selector inserted here -->
                 <select id="datasetSelector" class="search-box" style="max-width:250px;margin-top:20px;">
                     <option value="koi" {% if source == 'koi' %}selected{% endif %}>KOI</option>
                     <option value="tess" {% if source == 'tess' %}selected{% endif %}>TESS</option>
@@ -834,6 +866,18 @@
 
             <div id="searchResultsInfo" class="search-results-info" style="display: none;"></div>
 
+            <!-- Dataset summary + features (above visualization cards) -->
+            <section class="info-section">
+                <div class="info-card">
+                    <h3 class="card-title"><span id="datasetTitle">Dataset Summary</span></h3>
+                    <p id="datasetSummaryText">Loading dataset description…</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="card-title">Training Features</h3>
+                    <ul id="featureList"></ul>
+                </div>
+            </section>
+
             <!-- KPI cards removed per request -->
 
             
@@ -841,7 +885,7 @@
             <div class="visualization-section viz-split" style="margin-top:40px;">
                 <!-- Model Performance -->
                 <div class="visualization-container viz-left">
-                  <h3 class="viz-title"><i class="fas fa-chart-line"></i> Model Performance</h3>
+                  <h3 class="card-title">Model Performance</h3>
                   <div class="perf-stats">
                       <div class="perf-card">
                           <div class="perf-label">Total Records</div>
@@ -872,7 +916,7 @@
 
                 <!-- 3D Embedding Visualization -->
                 <div class="visualization-container viz-right">
-                  <h3 class="viz-title"><i class="fas fa-cube"></i> 3D Embedding Visualization</h3>
+                  <h3 class="card-title">3D Embedding Visualization</h3>
                   <iframe id="embeddingViewer" src="about:blank" class="embed-iframe"></iframe>
                 </div>
             </div>
@@ -881,6 +925,7 @@
 
             <section class="data-section">
                 <div class="table-container">
+                    <h3 id="tableTitle" class="card-title" style="margin-bottom: 16px;">Exoplanet Model Performance <span style="font-weight:400; color: var(--text-secondary); font-size:.95rem;">(Select a planet to change the views below)</span></h3>
                     <div id="loadingIndicator" class="loading">
                         <i class="fas fa-spinner fa-spin"></i>
                         <p>Loading exoplanet data...</p>
@@ -939,7 +984,27 @@
 
             <!-- Updated section with educational summary -->
             <section class="visualization-section">
+                <div class="left-stack">
+                    <div class="educational-summary left-card">
+                        <h3 class="card-title">Educational Summary</h3>
+                        <div id="summaryPlaceholder" class="summary-placeholder">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>No Planet Selected</h3>
+                            <p>Click on a row in the table to view educational information about the selected exoplanet.</p>
+                        </div>
+                        <div id="educationalSummary" class="educational-summary-content" style="display: none;">
+                            <!-- Educational summary content will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="lightkurve-card left-card">
+                        <h3 class="card-title">Lightkurve Data</h3>
+                        <p style="margin-bottom:10px;">This dashboard uses the Lightkurve project to access, clean, and visualize NASA Kepler and TESS light curves. Lightkurve provides a Python API for downloading target pixel files (TPFs) and light curves, performing detrending (e.g., <code>flatten()</code>), stitching sectors, and phase-folding data around transit times. In this app, generated GIFs summarize a 3D orbit schematic and the phased light curve using Lightkurve-processed flux measurements.</p>
+                        <p style="margin-top:10px;">Library: <a href="https://lightkurve.github.io/lightkurve/" target="_blank" rel="noopener">lightkurve.github.io/lightkurve</a></p>
+                    </div>
+                </div>
+
                 <div class="visualization-container">
+                    <h3 class="card-title">Light Curve & Orbit Preview</h3>
                     <div id="gifContent" class="gif-content">
                         <div id="gifPlaceholder" class="iframe-placeholder">
                             <i class="fas fa-image"></i>
@@ -947,81 +1012,11 @@
                             <p>Click on a row in the table to see its light curve visualization.</p>
                         </div>
                         <img id="gifImg" src="" alt="GIF Visualization" style="display: none;">
-                        <div class="gif-controls" style="display: none;">
-                            <button id="playButton" class="control-btn"><i class="fas fa-play"></i> Play</button>
-                            <button id="pauseButton" class="control-btn"><i class="fas fa-pause"></i> Pause</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="educational-summary">
-                    <h3><i class="fas fa-book"></i> Educational Summary</h3>
-                    <div id="summaryPlaceholder" class="summary-placeholder">
-                        <i class="fas fa-info-circle"></i>
-                        <h3>No Planet Selected</h3>
-                        <p>Click on a row in the table to view educational information about the selected exoplanet.</p>
-                    </div>
-                    <div id="educationalSummary" class="educational-summary-content" style="display: none;">
-                        <!-- Educational summary content will be populated by JavaScript -->
                     </div>
                 </div>
             </section>
 
-            <section class="github-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="fab fa-github"></i>
-                        Project Repository
-                    </div>
-                    <div class="github-stats">
-                        <div class="github-stat">
-                            <i class="fas fa-code-branch"></i>
-                            Open Source
-                        </div>
-                        <div class="github-stat">
-                            <i class="fas fa-star"></i>
-                            MIT License
-                        </div>
-                    </div>
-                </div>
-                <div class="github-container">
-                    <div class="github-content">
-                        <div class="github-info">
-                            <div class="github-description">
-                                <p>This exoplanet exploration dashboard is an open-source project dedicated to making exoplanet data accessible and interactive for researchers, students, and astronomy enthusiasts.</p>
-                            </div>
-                            <ul class="github-features">
-                                <li><i class="fas fa-check"></i> Real-time exoplanet data analysis</li>
-                                <li><i class="fas fa-check"></i> Interactive NASA visualizations</li>
-                                <li><i class="fas fa-check"></i> Community-driven development</li>
-                            </ul>
-                        </div>
-                        <div class="github-links">
-                            <a href="https://github.com/your-username/exoplanet-explorer" class="github-link" target="_blank">
-                                <i class="fab fa-github"></i>
-                                <div class="github-link-content">
-                                    <h4>Main Repository</h4>
-                                    <p>View source code and documentation</p>
-                                </div>
-                            </a>
-                            <a href="https://github.com/your-username/exoplanet-explorer/issues" class="github-link" target="_blank">
-                                <i class="fas fa-bug"></i>
-                                <div class="github-link-content">
-                                    <h4>Report Issues</h4>
-                                    <p>Found a bug? Let us know</p>
-                                </div>
-                            </a>
-                            <a href="https://github.com/your-username/exoplanet-explorer/pulls" class="github-link" target="_blank">
-                                <i class="fas fa-code-pull-request"></i>
-                                <div class="github-link-content">
-                                    <h4>Contribute</h4>
-                                    <p>Submit pull requests and improvements</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            
         </div>
     </main>
 
@@ -1053,7 +1048,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
+                <p>Â© <span id="current-year">2023</span> Exoplanet Explorer. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -1131,14 +1126,23 @@
                         row[col] = values[colIndex] ? values[colIndex].trim() : '';
                     });
                     
-                    // Include GIF and NASA URL if they exist in the CSV
-                    const gifIndex = allColumns.indexOf('gif') !== -1 ? allColumns.indexOf('gif') : allColumns.indexOf('gif_url');
-                    const nasaIndex = allColumns.indexOf('nasa_url') !== -1 ? allColumns.indexOf('nasa_url') : allColumns.indexOf('nasa');
-                    const summaryIndex = allColumns.indexOf('educational_summary') !== -1 ? allColumns.indexOf('educational_summary') : allColumns.indexOf('summary');
-                    
-                    if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex].trim() : '';
-                    if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex].trim() : '';
-                    if (summaryIndex !== -1) row['educational_summary'] = values[summaryIndex] ? values[summaryIndex].trim() : '';
+                // Include GIF and NASA URL if they exist in the CSV (case-insensitive, supports 'gifs')
+                const lowerIndex = {};
+                allColumns.forEach((c, i) => lowerIndex[c.toLowerCase()] = i);
+                function idxOfAny(names) {
+                    for (const n of names) {
+                        const hit = lowerIndex[n.toLowerCase()];
+                        if (hit !== undefined) return hit;
+                    }
+                    return -1;
+                }
+                const gifIndex = idxOfAny(['gif','gif_url','gifs','giflink','gif_link']);
+                const nasaIndex = idxOfAny(['nasa_url','nasa']);
+                const summaryIndex = idxOfAny(['educational_summary','summary']);
+
+                if (gifIndex !== -1) row['gif'] = values[gifIndex] ? values[gifIndex].trim() : '';
+                if (nasaIndex !== -1) row['nasa_url'] = values[nasaIndex] ? values[nasaIndex].trim() : '';
+                if (summaryIndex !== -1) row['educational_summary'] = values[summaryIndex] ? values[summaryIndex].trim() : '';
                     
                     allData.push(row);
                 }
@@ -1238,22 +1242,7 @@
                 }
             });
 
-            // GIF controls
-            document.getElementById('playButton').addEventListener('click', () => {
-                const gifImg = document.getElementById('gifImg');
-                const currentSrc = gifImg.src;
-                if (!currentSrc) return;
-                
-                // Re-assign src to restart the GIF
-                gifImg.src = '';
-                gifImg.src = currentSrc;
-            });
-
-            document.getElementById('pauseButton').addEventListener('click', () => {
-                // This is a trick: to "pause" a GIF, we can replace it with a canvas showing the current frame.
-                // For simplicity here, we'll just clear it. A true pause is complex.
-                document.getElementById('gifImg').src = ''; 
-            });
+            // GIF controls removed
         }
 
         // Perform search
@@ -1415,22 +1404,45 @@
 
         // Update GIF visualization based on selected row
         function updateGifVisualization(selectedRow) {
-            const gifUrl = selectedRow.getAttribute('data-gif');
+            const rawUrl = (selectedRow.getAttribute('data-gif') || '').trim();
             const gifImg = document.getElementById('gifImg');
             const gifPlaceholder = document.getElementById('gifPlaceholder');
-            const gifControls = document.querySelector('.gif-controls');
 
-            if (gifUrl) {
-                gifImg.src = gifUrl;
-                gifImg.style.display = 'block';
-                gifPlaceholder.style.display = 'none';
-                gifControls.style.display = 'flex';
-            } else {
+            // Helper to show placeholder
+            function showPlaceholder(msg) {
                 gifImg.src = '';
                 gifImg.style.display = 'none';
                 gifPlaceholder.style.display = 'flex';
-                gifControls.style.display = 'none';
+                if (msg) {
+                    gifPlaceholder.querySelector('h3')?.remove();
+                    const h = document.createElement('h3');
+                    h.textContent = msg;
+                    gifPlaceholder.prepend(h);
+                }
             }
+
+            if (!rawUrl) {
+                showPlaceholder('No GIF Selected');
+                return;
+            }
+
+            // Cache-bust to avoid stale image
+            const cacheBust = `v=${Date.now().toString().slice(-7)}`;
+            const sep = rawUrl.includes('?') ? '&' : '?';
+            const gifUrl = `${rawUrl}${sep}${cacheBust}`;
+
+            // Load image and only swap when ready
+            const probe = new Image();
+            probe.crossOrigin = 'anonymous';
+            probe.onload = () => {
+                gifImg.src = gifUrl;
+                gifImg.style.display = 'block';
+                gifPlaceholder.style.display = 'none';
+                // After the GIF appears, sync the left column heights to match
+                try { syncInfoHeights(); } catch (e) {}
+            };
+            probe.onerror = () => showPlaceholder('GIF unavailable');
+            probe.src = gifUrl;
         }
 
         // Update educational summary based on selected row
@@ -1448,16 +1460,15 @@
             });
 
             if (summaryText) {
+                // Remove any content beginning with "Key Characteristics" (case-insensitive)
+                let clean = summaryText;
+                const idx = clean.toLowerCase().indexOf('key characteristics');
+                if (idx !== -1) {
+                    clean = clean.slice(0, idx).trim();
+                }
                 educationalSummary.innerHTML = `
                     <h4>About ${planetName || 'this exoplanet'}</h4>
-                    <p>${summaryText}</p>
-                    <h4>Key Characteristics</h4>
-                    <ul>
-                        <li><strong>Discovery Method:</strong> ${selectedRow.querySelector('td[data-column="discoverymethod"]')?.textContent || 'Unknown'}</li>
-                        <li><strong>Orbital Period:</strong> ${selectedRow.querySelector('td[data-column="pl_orbper"]')?.textContent || 'Unknown'} days</li>
-                        <li><strong>Planet Radius:</strong> ${selectedRow.querySelector('td[data-column="pl_rade"]')?.textContent || 'Unknown'} Earth radii</li>
-                        <li><strong>Host Star:</strong> ${selectedRow.querySelector('td[data-column="hostname"]')?.textContent || 'Unknown'}</li>
-                    </ul>
+                    <p>${clean}</p>
                 `;
                 educationalSummary.style.display = 'block';
                 summaryPlaceholder.style.display = 'none';
@@ -1667,26 +1678,85 @@
         if (selectorEl) selectorEl.value = currentSource;
         // keep model chart in sync immediately
         try { initOrUpdatePerfChart(currentSource); } catch (e) {}
+        // dynamic table title based on dataset
+        function updateTableTitle() {
+            const el = document.getElementById("tableTitle");
+            if (!el) return;
+            el.innerHTML = "Exoplanet Model Performance <span style=\"font-weight:400; color: var(--text-secondary); font-size:.95rem;\">(Select a planet to change the views below)</span>";
+        }
+        
+        try { updateTableTitle(currentSource); } catch (e) {}
+
+        // Dataset summary + features
+        const DATASET_SUMMARY = {
+            koi: {
+                title: 'KOI Dataset',
+                text: 'The Kepler Objects of Interest (KOI) catalog from the NASA Kepler mission. Candidates are transit-like signals still under vetting, while confirmed planets have been statistically validated and/or confirmed with follow-up. Training uses transit/orbital features (period, depth, duration, impact parameter, eccentricity) plus host-star properties (T_eff, radius, mass) and four false-positive flags.',
+                features: [
+                    'orbital_period','planet_radius','semi_major_axis','eccentricity','insolation_flux',
+                    'stellar_radius','stellar_mass','stellar_teff','impact_parameter','transit_depth',
+                    'not_transit_like','stellar_eclipse','centroid_offset','ephemeris_match'
+                ]
+            },
+            tess: {
+                title: 'TESS Dataset',
+                text: 'Transiting Exoplanet Survey Satellite (TESS) objects of interest and confirmed planets. Candidates are targets awaiting validation; confirmed planets have been validated or confirmed via follow-up. Training uses transit shape/strength (depth, duration, SNR), orbital period and impact parameter, and host-star parameters (T_eff, radius, logg).',
+                features: [
+                    'transit_depth','transit_duration','transit_snr','orbital_period','impact_parameter',
+                    'stellar_teff','stellar_radius','stellar_logg','planet_radius','odd_even_stat','centroid_offset'
+                ]
+            },
+            combo: {
+                title: 'KOI & TESS Dataset',
+                text: 'A combined dataset created by aligning KOI and TESS catalogs to a common schema. It includes both candidates and confirmed planets from each mission. Training uses the intersection of shared features: orbital period, transit depth/duration, impact parameter, host-star T_eff/radius/mass, eccentricity, insolation, and centroid metrics.',
+                features: [
+                    'orbital_period','planet_radius','stellar_teff','stellar_radius','impact_parameter',
+                    'transit_depth','insolation_flux','stellar_mass','eccentricity','centroid_offset'
+                ]
+            }
+        };
+
+        function renderDatasetInfo(sourceKey){
+            const key = (sourceKey||'koi').toLowerCase();
+            const cfg = DATASET_SUMMARY[key] || DATASET_SUMMARY.koi;
+            const h = document.getElementById('datasetTitle');
+            const p = document.getElementById('datasetSummaryText');
+            const ul = document.getElementById('featureList');
+            if (h) h.textContent = cfg.title || 'Dataset Summary';
+            if (p) p.textContent = cfg.text;
+            if (ul) ul.innerHTML = (cfg.features||[]).map(f => `<li>${f.replace(/_/g,' ')}</li>`).join('');
+        }
+        try { renderDatasetInfo(currentSource); } catch (e) {}
+
+        // Override title updater to output plain text style (no emoji markers)
+        function updateTableTitle() {
+            const el = document.getElementById("tableTitle");
+            if (!el) return;
+            el.innerHTML = "Exoplanet Model Performance <span style=\"font-weight:400; color: var(--text-secondary); font-size:.95rem;\">(Select a planet to change the views below)</span>";
+        }
+        try { updateTableTitle(currentSource); } catch (e) {}
 
         // map dataset -> hosted 3D viewer page
-        const EMBED_BASE = 'https://rogereo.github.io/assets/embedding/';
+        const EMBED_BASE = '/assets/embedding/';
+        const VIEWER_VERSION = '20251106-2'; // cache-bust when assets change
         const VIEWER_BY_SOURCE = {
             koi:   EMBED_BASE + 'viewer_koi.html',
             tess:  EMBED_BASE + 'viewer_tess.html',
-            combo: EMBED_BASE + 'viewer_combo.html'
+            combo: EMBED_BASE + 'viewer_comb.html'
         };
 
         // set initial 3D viewer (on page load)
         const embeddingIframe = document.getElementById('embeddingViewer');
         if (embeddingIframe) {
-            embeddingIframe.src = VIEWER_BY_SOURCE[currentSource] || VIEWER_BY_SOURCE.koi;
+            const url = (VIEWER_BY_SOURCE[currentSource] || VIEWER_BY_SOURCE.koi) + `?v=${VIEWER_VERSION}`;
+            embeddingIframe.src = url;
         }
 
         // when user switches the dataset, update the 3D viewer (and URL for consistency)
         document.getElementById('datasetSelector').addEventListener('change', function () {
             const selected = this.value; // 'koi' | 'tess' | 'combo'
-            // update iframe
-            embeddingIframe.src = VIEWER_BY_SOURCE[selected] || VIEWER_BY_SOURCE.koi;
+            // update iframe (cache-busted)
+            embeddingIframe.src = (VIEWER_BY_SOURCE[selected] || VIEWER_BY_SOURCE.koi) + `?v=${VIEWER_VERSION}`;
 
             // (optional but recommended) reflect selection in the URL to keep state/share links
             urlParams.set('source', selected);
@@ -1694,6 +1764,8 @@
             window.history.replaceState({}, '', newUrl);
             // also update the model performance view live
             try { initOrUpdatePerfChart(selected); } catch (e) {}
+            try { renderDatasetInfo(selected); } catch (e) {}
+            try { updateTableTitle(selected); } catch (e) {}
         });
 
         // Load dataset CSVs and update table on selection change
@@ -1701,14 +1773,15 @@
         const selector = document.getElementById("datasetSelector");
         const embeddingViewer = document.getElementById("embeddingViewer");
 
-        const EMBED_BASE = "https://rogereo.github.io/assets/embedding/";
+        const EMBED_BASE = "/assets/embedding/";
+        const VIEWER_VERSION_LOCAL = VIEWER_VERSION;
         const VIEWER_BY_SOURCE = {
             koi:   EMBED_BASE + "viewer_koi.html",
             tess:  EMBED_BASE + "viewer_tess.html",
-            combo: EMBED_BASE + "viewer_combo.html"
+            combo: EMBED_BASE + "viewer_comb.html"
         };
 
-        // ✅ point to CSVs hosted on your GitHub Pages site
+        // âœ… point to CSVs hosted on your GitHub Pages site
         const DATA_BY_SOURCE = {
             koi:   "/api/data/koi",
             tess:  "/api/data/tess",
@@ -1719,7 +1792,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const currentSource = urlParams.get("source") || "koi";
         selector.value = currentSource;
-        embeddingViewer.src = VIEWER_BY_SOURCE[currentSource];
+        embeddingViewer.src = VIEWER_BY_SOURCE[currentSource] + `?v=${VIEWER_VERSION_LOCAL}`;
+        try { updateTableTitle(currentSource); } catch (e) {}
 
         // load initial dataset
         fetch(DATA_BY_SOURCE[currentSource])
@@ -1730,7 +1804,7 @@
         // on change
         selector.addEventListener("change", function () {
             const selected = this.value;
-            embeddingViewer.src = VIEWER_BY_SOURCE[selected];
+            embeddingViewer.src = VIEWER_BY_SOURCE[selected] + `?v=${VIEWER_VERSION_LOCAL}`;
             urlParams.set("source", selected);
             window.history.replaceState({}, "", `${window.location.pathname}?${urlParams.toString()}`);
 
@@ -1742,11 +1816,41 @@
 
             // refresh model performance on dataset switch
             try { initOrUpdatePerfChart(selected); } catch (e) {}
+            try { renderDatasetInfo(selected); } catch (e) {}
+            try { updateTableTitle(selected); } catch (e) {}
         // ensure other UI listeners are bound once DOM is ready
         initializeEventListeners();
         });
+
+        // Ensure the right panel is at least as tall as left, but prefers a viewport-based height
+        function syncVizHeights() {
+            const left = document.querySelector('.viz-left');
+            const right = document.querySelector('.viz-right');
+            if (!left || !right) return;
+            const base = Math.max(560, Math.round(window.innerHeight * 0.72));
+            right.style.height = Math.max(base, left.offsetHeight) + 'px';
+        }
+        window.addEventListener('load', syncVizHeights);
+        window.addEventListener('resize', syncVizHeights);
+        const ro = new ResizeObserver(syncVizHeights);
+        const leftNode = document.querySelector('.viz-left');
+        if (leftNode) ro.observe(leftNode);
+
+        // Sync the two left cards (educational summary + Lightkurve) so their combined height equals the GIF panel height
+        function syncInfoHeights() {
+            const rightPanel = document.getElementById('gifContent')?.closest('.visualization-container');
+            const leftStack = document.querySelector('.left-stack');
+            if (!rightPanel || !leftStack) return;
+            const h = rightPanel.offsetHeight;
+            if (h > 0) leftStack.style.height = h + 'px';
+        }
+        window.addEventListener('load', syncInfoHeights);
+        window.addEventListener('resize', syncInfoHeights);
         });
 
     </script>
 </body>
 </html>
+
+
+

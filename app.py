@@ -36,6 +36,19 @@ DATASETS = {
     "combo": "data_combo.csv",
 }
 
+# Serve embedding viewer assets (HTML, JSON, etc.) from sibling project
+EMBED_DIR = (BASE_DIR.parent / "rogereo.github.io" / "assets" / "embedding").resolve()
+
+
+@app.route("/assets/embedding/<path:filename>")
+def embedding_assets(filename: str):
+    if not EMBED_DIR.exists():
+        abort(404)
+    try:
+        return send_from_directory(EMBED_DIR, filename)
+    except FileNotFoundError:
+        abort(404)
+
 
 @app.route("/api/data/<source>")
 def api_data(source: str):
