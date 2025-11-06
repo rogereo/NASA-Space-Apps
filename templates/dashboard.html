@@ -1737,7 +1737,7 @@
         try { updateTableTitle(currentSource); } catch (e) {}
 
         // map dataset -> hosted 3D viewer page
-        const EMBED_BASE = '/assets/embedding/';
+        const EMBED_BASE = 'https://rogereo.github.io/assets/embedding/';
         const VIEWER_VERSION = '20251106-2'; // cache-bust when assets change
         const VIEWER_BY_SOURCE = {
             koi:   EMBED_BASE + 'viewer_koi.html',
@@ -1773,7 +1773,7 @@
         const selector = document.getElementById("datasetSelector");
         const embeddingViewer = document.getElementById("embeddingViewer");
 
-        const EMBED_BASE = "/assets/embedding/";
+        const EMBED_BASE = "https://rogereo.github.io/assets/embedding/";
         const VIEWER_VERSION_LOCAL = VIEWER_VERSION;
         const VIEWER_BY_SOURCE = {
             koi:   EMBED_BASE + "viewer_koi.html",
