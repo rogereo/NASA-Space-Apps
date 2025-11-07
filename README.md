@@ -6,6 +6,10 @@
 
 An interactive Flask web app for exploring exoplanet datasets (KOI and TESS) with search, summary stats, charts, and a clean dashboard UI.
 
+<p align="center">
+  <img src="assets/LandingPage.png" alt="Website" width="500" />
+</p>
+
 ## Live Site
 - https://exoplanet-dvu2.onrender.com/
 
