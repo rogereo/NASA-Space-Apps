@@ -1691,27 +1691,27 @@
         const DATASET_SUMMARY = {
             koi: {
                 title: 'KOI Dataset',
-                text: 'The Kepler Objects of Interest (KOI) catalog from the NASA Kepler mission. Candidates are transit-like signals still under vetting, while confirmed planets have been statistically validated and/or confirmed with follow-up. Training uses transit/orbital features (period, depth, duration, impact parameter, eccentricity) plus host-star properties (T_eff, radius, mass) and four false-positive flags.',
+                text: 'The Kepler Objects of Interest (KOI) catalog from the NASA Kepler mission. Candidates are transit-like signals still under vetting, while confirmed planets have been statistically validated and/or confirmed with follow-up. Training uses transit/orbital + host-star features (period, epoch, duration, depth, planet radius, equilibrium temperature, stellar T_eff/logg/radius, Kepler magnitude) and four false-positive flags.',
                 features: [
-                    'orbital_period','planet_radius','semi_major_axis','eccentricity','insolation_flux',
-                    'stellar_radius','stellar_mass','stellar_teff','impact_parameter','transit_depth',
+                    'orbital_period','transit_epoch','transit_duration','transit_depth','planet_radius',
+                    'equilibrium_temperature','stellar_teff','stellar_logg','stellar_radius','kepler_magnitude',
                     'not_transit_like','stellar_eclipse','centroid_offset','ephemeris_match'
                 ]
             },
             tess: {
                 title: 'TESS Dataset',
-                text: 'Transiting Exoplanet Survey Satellite (TESS) objects of interest and confirmed planets. Candidates are targets awaiting validation; confirmed planets have been validated or confirmed via follow-up. Training uses transit shape/strength (depth, duration, SNR), orbital period and impact parameter, and host-star parameters (T_eff, radius, logg).',
+                text: 'Transiting Exoplanet Survey Satellite (TESS) objects of interest and confirmed planets. Candidates are targets awaiting validation; confirmed planets have been validated or confirmed via follow-up. Training uses transit/orbital + host-star features (period, duration, depth, planet radius, equilibrium temperature, insolation flux, stellar T_eff/logg/radius, TESS magnitude, and distance).',
                 features: [
-                    'transit_depth','transit_duration','transit_snr','orbital_period','impact_parameter',
-                    'stellar_teff','stellar_radius','stellar_logg','planet_radius','odd_even_stat','centroid_offset'
+                    'orbital_period','transit_duration','transit_depth','planet_radius','equilibrium_temperature',
+                    'insolation_flux','stellar_teff','stellar_logg','stellar_radius','tess_mag','stellar_distance'
                 ]
             },
             combo: {
                 title: 'KOI & TESS Dataset',
-                text: 'A combined dataset created by aligning KOI and TESS catalogs to a common schema. It includes both candidates and confirmed planets from each mission. Training uses the intersection of shared features: orbital period, transit depth/duration, impact parameter, host-star T_eff/radius/mass, eccentricity, insolation, and centroid metrics.',
+                text: 'A combined dataset created by aligning KOI and TESS catalogs to a common schema. Training uses the shared features used by the model: orbital period, transit duration, transit depth, planet radius, equilibrium temperature, stellar T_eff, stellar logg, and stellar radius.',
                 features: [
-                    'orbital_period','planet_radius','stellar_teff','stellar_radius','impact_parameter',
-                    'transit_depth','insolation_flux','stellar_mass','eccentricity','centroid_offset'
+                    'orbital_period','transit_duration','transit_depth','planet_radius',
+                    'equilibrium_temperature','stellar_teff','stellar_logg','stellar_radius'
                 ]
             }
         };
