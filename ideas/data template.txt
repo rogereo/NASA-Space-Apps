@@ -1,6 +1,0 @@
-Star System,Planet,Gradient Boosting BM,XGBoost BM,LightGBM BM,RandomForest BM,Ensemble BM,Gradient Boosting EM,XGBoost EM,LightGBM EM,RandomForest EM,Ensemble EM,Actual EM
-10854555,Kepler-664 b,Confirmed,False Positive,Confirmed,False Positive,Confirmed,False Positive,False Positive,Confirmed,False Positive,Confirmed,Confirmed
-10872983,Kepler-228 d,False Positive,Confirmed,False Positive,False Positive,Confirmed,False Positive,Confirmed,False Positive,False Positive,Confirmed,False Positive
-10872983,Kepler-228 c,Confirmed,Candidate,Candidate,Candidate,False Positive,False Positive,Candidate,Candidate,Candidate,False Positive,Candidate
-10872983,Kepler-228 b,Confirmed,False Positive,False Positive,Candidate,Candidate,Confirmed,False Positive,False Positive,Candidate,Candidate,Confirmed
-10910878,Kepler-229 c,False Positive,False Positive,False Positive,Confirmed,False Positive,False Positive,False Positive,False Positive,Confirmed,False Positive,False Positive
